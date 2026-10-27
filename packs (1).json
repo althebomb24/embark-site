@@ -1,0 +1,1237 @@
+{
+  "packs": [
+    {
+      "id": "socializing",
+      "goalKey": "socializing",
+      "name": "Socializing",
+      "emoji": "🤝",
+      "whys": [
+        {
+          "id": "shyness",
+          "label": "Overcome shyness"
+        },
+        {
+          "id": "friends",
+          "label": "Build stronger friendships"
+        },
+        {
+          "id": "network",
+          "label": "Expand network"
+        },
+        {
+          "id": "lonely",
+          "label": "Feel less lonely"
+        }
+      ],
+      "premium": false,
+      "productId": null
+    },
+    {
+      "id": "decluttering",
+      "goalKey": "decluttering",
+      "name": "Decluttering",
+      "emoji": "🧹",
+      "whys": [
+        {
+          "id": "stress",
+          "label": "Reduce stress"
+        },
+        {
+          "id": "move",
+          "label": "Prepare for a move"
+        },
+        {
+          "id": "minimal",
+          "label": "Embrace minimalism"
+        },
+        {
+          "id": "productivity",
+          "label": "Boost productivity"
+        }
+      ],
+      "premium": false,
+      "productId": null
+    },
+    {
+      "id": "fitness",
+      "goalKey": "fitness",
+      "name": "Fitness",
+      "emoji": "💪",
+      "whys": [
+        {
+          "id": "energy",
+          "label": "Have more energy"
+        },
+        {
+          "id": "strength",
+          "label": "Get stronger"
+        },
+        {
+          "id": "health",
+          "label": "Improve health"
+        },
+        {
+          "id": "mood",
+          "label": "Improve mood"
+        }
+      ],
+      "premium": true,
+      "productId": "pack_fitness"
+    },
+    {
+      "id": "learning",
+      "goalKey": "learning",
+      "name": "Learning",
+      "emoji": "📚",
+      "whys": [
+        {
+          "id": "skill",
+          "label": "Learn a skill"
+        },
+        {
+          "id": "career",
+          "label": "Advance career"
+        },
+        {
+          "id": "curiosity",
+          "label": "Satisfy curiosity"
+        },
+        {
+          "id": "confidence",
+          "label": "Feel more capable"
+        }
+      ],
+      "premium": false,
+      "productId": null
+    },
+    {
+      "id": "habits",
+      "goalKey": "habits",
+      "name": "Habit Building",
+      "emoji": "🔁",
+      "whys": [
+        {
+          "id": "consistency",
+          "label": "Become consistent"
+        },
+        {
+          "id": "morning",
+          "label": "Better morning routine"
+        },
+        {
+          "id": "focus",
+          "label": "Improve focus"
+        },
+        {
+          "id": "selfcare",
+          "label": "Better self-care"
+        }
+      ],
+      "premium": true,
+      "productId": "pack_habits"
+    }
+  ],
+  "goals": {
+    "socializing": {
+      "name": "Socializing",
+      "emoji": "🤝",
+      "whys": [
+        {
+          "id": "shyness",
+          "label": "Overcome shyness"
+        },
+        {
+          "id": "friends",
+          "label": "Build stronger friendships"
+        },
+        {
+          "id": "network",
+          "label": "Expand network"
+        },
+        {
+          "id": "lonely",
+          "label": "Feel less lonely"
+        }
+      ]
+    },
+    "decluttering": {
+      "name": "Decluttering",
+      "emoji": "🧹",
+      "whys": [
+        {
+          "id": "stress",
+          "label": "Reduce stress"
+        },
+        {
+          "id": "move",
+          "label": "Prepare for a move"
+        },
+        {
+          "id": "minimal",
+          "label": "Embrace minimalism"
+        },
+        {
+          "id": "productivity",
+          "label": "Boost productivity"
+        }
+      ]
+    },
+    "fitness": {
+      "name": "Fitness",
+      "emoji": "💪",
+      "premium": true,
+      "productId": "pack_fitness",
+      "whys": [
+        {
+          "id": "energy",
+          "label": "Have more energy"
+        },
+        {
+          "id": "strength",
+          "label": "Get stronger"
+        },
+        {
+          "id": "health",
+          "label": "Improve health"
+        },
+        {
+          "id": "mood",
+          "label": "Improve mood"
+        }
+      ]
+    },
+    "learning": {
+      "name": "Learning",
+      "emoji": "📚",
+      "whys": [
+        {
+          "id": "skill",
+          "label": "Learn a skill"
+        },
+        {
+          "id": "career",
+          "label": "Advance career"
+        },
+        {
+          "id": "curiosity",
+          "label": "Satisfy curiosity"
+        },
+        {
+          "id": "confidence",
+          "label": "Feel more capable"
+        }
+      ]
+    },
+    "habits": {
+      "name": "Habit Building",
+      "emoji": "🔁",
+      "premium": true,
+      "productId": "pack_habits",
+      "whys": [
+        {
+          "id": "consistency",
+          "label": "Become consistent"
+        },
+        {
+          "id": "morning",
+          "label": "Better morning routine"
+        },
+        {
+          "id": "focus",
+          "label": "Improve focus"
+        },
+        {
+          "id": "selfcare",
+          "label": "Better self-care"
+        }
+      ]
+    }
+  },
+  "quests": {
+    "socializing": [
+      {
+        "id": 1,
+        "task": "Say hi to 5 people",
+        "hint": "Simple greeting counts",
+        "max": 5,
+        "chapter": "Chapter I — The Toll of Five Hellos",
+        "story": {
+          "default": "The sun hasn't cleared the hills when you reach Alderbrook, but the village gate stands shut. Blocking it is Bram — a badger the size of a barrel, arms crossed, eyebrows like thunderheads. 'No strangers past this gate,' he rumbles. 'Not until the town knows your face.' Your heart sinks. Then Bram's stern face cracks, just slightly. 'There's a toll, and it ain't coin. Five hellos. Greet five souls on the road today — the baker at her stall, the courier on his rounds, a traveler you've never met — and each hello is a key turning in this lock. Come back at dusk with five, and I'll swing the gate wide myself.' Five greetings. Five keys. The road is waiting — and Bram is watching.",
+          "shyness": "The sun hasn't cleared the hills when you reach Alderbrook, but the village gate stands shut. Blocking it is Bram — a badger the size of a barrel, arms crossed, eyebrows like thunderheads. 'No strangers past this gate,' he rumbles. 'Not until the town knows your face.' Your heart sinks. Then Bram's stern face cracks, just slightly. 'There's a toll, and it ain't coin. Five hellos. Greet five souls on the road today — the baker at her stall, the courier on his rounds, a traveler you've never met — and each hello is a key turning in this lock. Come back at dusk with five, and I'll swing the gate wide myself.' Five greetings. Five keys. The road is waiting — and Bram is watching.",
+          "friends": "The sun hasn't cleared the hills when you reach Alderbrook, but the village gate stands shut. Blocking it is Bram — a badger the size of a barrel, arms crossed, eyebrows like thunderheads. 'No strangers past this gate,' he rumbles. 'Not until the town knows your face.' Your heart sinks. Then Bram's stern face cracks, just slightly. 'There's a toll, and it ain't coin. Five hellos. Greet five souls on the road today — the baker at her stall, the courier on his rounds, a traveler you've never met — and each hello is a key turning in this lock. Come back at dusk with five, and I'll swing the gate wide myself.' Five greetings. Five keys. The road is waiting — and Bram is watching.",
+          "network": "The sun hasn't cleared the hills when you reach Alderbrook, but the village gate stands shut. Blocking it is Bram — a badger the size of a barrel, arms crossed, eyebrows like thunderheads. 'No strangers past this gate,' he rumbles. 'Not until the town knows your face.' Your heart sinks. Then Bram's stern face cracks, just slightly. 'There's a toll, and it ain't coin. Five hellos. Greet five souls on the road today — the baker at her stall, the courier on his rounds, a traveler you've never met — and each hello is a key turning in this lock. Come back at dusk with five, and I'll swing the gate wide myself.' Five greetings. Five keys. The road is waiting — and Bram is watching.",
+          "lonely": "The sun hasn't cleared the hills when you reach Alderbrook, but the village gate stands shut. Blocking it is Bram — a badger the size of a barrel, arms crossed, eyebrows like thunderheads. 'No strangers past this gate,' he rumbles. 'Not until the town knows your face.' Your heart sinks. Then Bram's stern face cracks, just slightly. 'There's a toll, and it ain't coin. Five hellos. Greet five souls on the road today — the baker at her stall, the courier on his rounds, a traveler you've never met — and each hello is a key turning in this lock. Come back at dusk with five, and I'll swing the gate wide myself.' Five greetings. Five keys. The road is waiting — and Bram is watching."
+        },
+        "outcomes": {
+          "complete": {
+            "text": "The Elders smile. You showed courage.",
+            "title": "Village Greeter",
+            "xp": 100,
+            "emoji": "🌟"
+          },
+          "partial": {
+            "text": "You managed a few hellos.",
+            "title": "Shy Smiler",
+            "xp": 25,
+            "emoji": "🙂"
+          },
+          "skip": {
+            "text": "You slipped away this time.",
+            "title": null,
+            "xp": 0,
+            "emoji": "🌙"
+          }
+        }
+      },
+      {
+        "id": 2,
+        "task": "Have a real conversation with 2 people",
+        "hint": "2-3 minutes each",
+        "max": 2,
+        "chapter": "Chapter II — The Innkeeper’s Price",
+        "story": {
+          "default": "Bram swung the gate wide himself, just like he promised. But Alderbrook has a second gatekeeper: Mira, who runs the Lantern Inn — and she doesn't rent rooms to strangers. 'A bed's for people, not passers-through,' she says, polishing a glass. 'Here's my price: two real conversations. Not weather talk — something true. Find two souls in this town, sit with them, and let them see you. Come back when two people know your name for real, and the corner room is yours.' Two conversations. Two keys. The inn's warm light is waiting.",
+          "shyness": "Bram swung the gate wide himself, just like he promised. But Alderbrook has a second gatekeeper: Mira, who runs the Lantern Inn — and she doesn't rent rooms to strangers. 'A bed's for people, not passers-through,' she says, polishing a glass. 'Here's my price: two real conversations. Not weather talk — something true. Find two souls in this town, sit with them, and let them see you. Come back when two people know your name for real, and the corner room is yours.' Two conversations. Two keys. The inn's warm light is waiting.",
+          "friends": "Bram swung the gate wide himself, just like he promised. But Alderbrook has a second gatekeeper: Mira, who runs the Lantern Inn — and she doesn't rent rooms to strangers. 'A bed's for people, not passers-through,' she says, polishing a glass. 'Here's my price: two real conversations. Not weather talk — something true. Find two souls in this town, sit with them, and let them see you. Come back when two people know your name for real, and the corner room is yours.' Two conversations. Two keys. The inn's warm light is waiting.",
+          "network": "Bram swung the gate wide himself, just like he promised. But Alderbrook has a second gatekeeper: Mira, who runs the Lantern Inn — and she doesn't rent rooms to strangers. 'A bed's for people, not passers-through,' she says, polishing a glass. 'Here's my price: two real conversations. Not weather talk — something true. Find two souls in this town, sit with them, and let them see you. Come back when two people know your name for real, and the corner room is yours.' Two conversations. Two keys. The inn's warm light is waiting.",
+          "lonely": "Bram swung the gate wide himself, just like he promised. But Alderbrook has a second gatekeeper: Mira, who runs the Lantern Inn — and she doesn't rent rooms to strangers. 'A bed's for people, not passers-through,' she says, polishing a glass. 'Here's my price: two real conversations. Not weather talk — something true. Find two souls in this town, sit with them, and let them see you. Come back when two people know your name for real, and the corner room is yours.' Two conversations. Two keys. The inn's warm light is waiting."
+        },
+        "outcomes": {
+          "complete": {
+            "text": "Conversations flowed well.",
+            "title": "Conversation Weaver",
+            "xp": 45,
+            "emoji": "🗣️"
+          },
+          "partial": {
+            "text": "You had one solid chat.",
+            "title": "Gentle Talker",
+            "xp": 20,
+            "emoji": "💬"
+          },
+          "skip": {
+            "text": "Today felt too heavy.",
+            "title": null,
+            "xp": 0,
+            "emoji": "🍃"
+          }
+        }
+      },
+      {
+        "id": 3,
+        "task": "Attend or create a small social moment",
+        "hint": "20-30 minutes is enough",
+        "max": 1,
+        "chapter": "Chapter III — A Seat by the Fire",
+        "story": {
+          "default": "Word travels fast in Alderbrook: the stranger paid Mira's price. Now comes the town's oldest tradition — the firelight moot, held every week in the square. Anyone may take a seat by the fire, but custom demands you bring something: a story, a song, or simply yourself, fully present. 'Outsiders usually watch from the edge,' says Bram, nudging you forward. 'Don't. Take the empty seat. Stay a while. Let the town see you're not passing through.' The fire is lit. Your seat is empty.",
+          "shyness": "Word travels fast in Alderbrook: the stranger paid Mira's price. Now comes the town's oldest tradition — the firelight moot, held every week in the square. Anyone may take a seat by the fire, but custom demands you bring something: a story, a song, or simply yourself, fully present. 'Outsiders usually watch from the edge,' says Bram, nudging you forward. 'Don't. Take the empty seat. Stay a while. Let the town see you're not passing through.' The fire is lit. Your seat is empty.",
+          "friends": "Word travels fast in Alderbrook: the stranger paid Mira's price. Now comes the town's oldest tradition — the firelight moot, held every week in the square. Anyone may take a seat by the fire, but custom demands you bring something: a story, a song, or simply yourself, fully present. 'Outsiders usually watch from the edge,' says Bram, nudging you forward. 'Don't. Take the empty seat. Stay a while. Let the town see you're not passing through.' The fire is lit. Your seat is empty.",
+          "network": "Word travels fast in Alderbrook: the stranger paid Mira's price. Now comes the town's oldest tradition — the firelight moot, held every week in the square. Anyone may take a seat by the fire, but custom demands you bring something: a story, a song, or simply yourself, fully present. 'Outsiders usually watch from the edge,' says Bram, nudging you forward. 'Don't. Take the empty seat. Stay a while. Let the town see you're not passing through.' The fire is lit. Your seat is empty.",
+          "lonely": "Word travels fast in Alderbrook: the stranger paid Mira's price. Now comes the town's oldest tradition — the firelight moot, held every week in the square. Anyone may take a seat by the fire, but custom demands you bring something: a story, a song, or simply yourself, fully present. 'Outsiders usually watch from the edge,' says Bram, nudging you forward. 'Don't. Take the empty seat. Stay a while. Let the town see you're not passing through.' The fire is lit. Your seat is empty."
+        },
+        "outcomes": {
+          "complete": {
+            "text": "You showed up and belonged.",
+            "title": "Circle Member",
+            "xp": 60,
+            "emoji": "🔥"
+          },
+          "partial": {
+            "text": "You almost made it.",
+            "title": "Almost There",
+            "xp": 15,
+            "emoji": "⏳"
+          },
+          "skip": {
+            "text": "You stayed away.",
+            "title": null,
+            "xp": 0,
+            "emoji": "🌫️"
+          }
+        }
+      },
+      {
+        "id": 4,
+        "task": "Reach out first and suggest a plan",
+        "hint": "Message, call, or in person",
+        "max": 1,
+        "chapter": "Chapter IV — The Send-Off",
+        "story": {
+          "default": "Bram finds you at dawn, turning his cap in his paws — the first time you've seen the old badger nervous. 'My daughter rides out with the merchant caravan tomorrow,' he mutters. 'Someone ought to give her a proper send-off. I've... never been good at starting such things.' He looks at you. This is the quest no one assigns: reach out first. Message, call, or walk up in person — propose the gathering, set the time, make it real. Bram can't ask. So you will.",
+          "shyness": "Bram finds you at dawn, turning his cap in his paws — the first time you've seen the old badger nervous. 'My daughter rides out with the merchant caravan tomorrow,' he mutters. 'Someone ought to give her a proper send-off. I've... never been good at starting such things.' He looks at you. This is the quest no one assigns: reach out first. Message, call, or walk up in person — propose the gathering, set the time, make it real. Bram can't ask. So you will.",
+          "friends": "Bram finds you at dawn, turning his cap in his paws — the first time you've seen the old badger nervous. 'My daughter rides out with the merchant caravan tomorrow,' he mutters. 'Someone ought to give her a proper send-off. I've... never been good at starting such things.' He looks at you. This is the quest no one assigns: reach out first. Message, call, or walk up in person — propose the gathering, set the time, make it real. Bram can't ask. So you will.",
+          "network": "Bram finds you at dawn, turning his cap in his paws — the first time you've seen the old badger nervous. 'My daughter rides out with the merchant caravan tomorrow,' he mutters. 'Someone ought to give her a proper send-off. I've... never been good at starting such things.' He looks at you. This is the quest no one assigns: reach out first. Message, call, or walk up in person — propose the gathering, set the time, make it real. Bram can't ask. So you will.",
+          "lonely": "Bram finds you at dawn, turning his cap in his paws — the first time you've seen the old badger nervous. 'My daughter rides out with the merchant caravan tomorrow,' he mutters. 'Someone ought to give her a proper send-off. I've... never been good at starting such things.' He looks at you. This is the quest no one assigns: reach out first. Message, call, or walk up in person — propose the gathering, set the time, make it real. Bram can't ask. So you will."
+        },
+        "outcomes": {
+          "complete": {
+            "text": "You moved first. The Gate opens.",
+            "title": "Path Opener",
+            "xp": 70,
+            "emoji": "🚪"
+          },
+          "partial": {
+            "text": "You almost reached out.",
+            "title": "Nearly Brave",
+            "xp": 20,
+            "emoji": "📝"
+          },
+          "skip": {
+            "text": "The Gate stays closed.",
+            "title": null,
+            "xp": 0,
+            "emoji": "🗺️"
+          }
+        }
+      },
+      {
+        "id": 5,
+        "task": "Initiate one social plan and follow through",
+        "hint": "Coffee, walk, or call",
+        "max": 1,
+        "chapter": "Chapter V — The New Tradition",
+        "story": {
+          "default": "The send-off was perfect — lanterns, laughter, Bram crying into his ale where he thought no one could see. Now the town turns to you. 'You've been given a seat, a room, and a gate,' Mira says. 'Time to give something back.' In Alderbrook, belonging isn't declared; it's demonstrated. Initiate the gathering yourself — plan it, invite them, follow it through to the last goodbye. If it holds, it becomes tradition. And traditions are how strangers become kin.",
+          "shyness": "The send-off was perfect — lanterns, laughter, Bram crying into his ale where he thought no one could see. Now the town turns to you. 'You've been given a seat, a room, and a gate,' Mira says. 'Time to give something back.' In Alderbrook, belonging isn't declared; it's demonstrated. Initiate the gathering yourself — plan it, invite them, follow it through to the last goodbye. If it holds, it becomes tradition. And traditions are how strangers become kin.",
+          "friends": "The send-off was perfect — lanterns, laughter, Bram crying into his ale where he thought no one could see. Now the town turns to you. 'You've been given a seat, a room, and a gate,' Mira says. 'Time to give something back.' In Alderbrook, belonging isn't declared; it's demonstrated. Initiate the gathering yourself — plan it, invite them, follow it through to the last goodbye. If it holds, it becomes tradition. And traditions are how strangers become kin.",
+          "network": "The send-off was perfect — lanterns, laughter, Bram crying into his ale where he thought no one could see. Now the town turns to you. 'You've been given a seat, a room, and a gate,' Mira says. 'Time to give something back.' In Alderbrook, belonging isn't declared; it's demonstrated. Initiate the gathering yourself — plan it, invite them, follow it through to the last goodbye. If it holds, it becomes tradition. And traditions are how strangers become kin.",
+          "lonely": "The send-off was perfect — lanterns, laughter, Bram crying into his ale where he thought no one could see. Now the town turns to you. 'You've been given a seat, a room, and a gate,' Mira says. 'Time to give something back.' In Alderbrook, belonging isn't declared; it's demonstrated. Initiate the gathering yourself — plan it, invite them, follow it through to the last goodbye. If it holds, it becomes tradition. And traditions are how strangers become kin."
+        },
+        "outcomes": {
+          "complete": {
+            "text": "You created the moment.",
+            "title": "Connection Catalyst",
+            "xp": 80,
+            "emoji": "✨"
+          },
+          "partial": {
+            "text": "You reached out but it didn't fully happen.",
+            "title": "Seeder",
+            "xp": 25,
+            "emoji": "🌱"
+          },
+          "skip": {
+            "text": "The final step waits.",
+            "title": null,
+            "xp": 0,
+            "emoji": "🕯️"
+          }
+        }
+      }
+    ],
+    "decluttering": [
+      {
+        "id": 1,
+        "task": "Clear one small area",
+        "hint": "Drawer, shelf or desk - 15-30 min",
+        "max": 1,
+        "chapter": "Chapter I — Locker Seven",
+        "story": {
+          "default": "The starship Meridian runs on order — three hundred souls breathing recycled air, every cubic meter accounted for. Quartermaster Vex slaps a manifest into your chest. 'Deck C, Locker Seven. One storage bay, choked with dead equipment nobody's touched since launch. Clear one small area — a drawer, a shelf, a corner of that bay. Every deep-space voyage stays alive because somebody cleared one locker at a time. Today's somebody is you.'",
+          "stress": "The starship Meridian runs on order — three hundred souls breathing recycled air, every cubic meter accounted for. Quartermaster Vex slaps a manifest into your chest. 'Deck C, Locker Seven. One storage bay, choked with dead equipment nobody's touched since launch. Clear one small area — a drawer, a shelf, a corner of that bay. Every deep-space voyage stays alive because somebody cleared one locker at a time. Today's somebody is you.'",
+          "move": "The starship Meridian runs on order — three hundred souls breathing recycled air, every cubic meter accounted for. Quartermaster Vex slaps a manifest into your chest. 'Deck C, Locker Seven. One storage bay, choked with dead equipment nobody's touched since launch. Clear one small area — a drawer, a shelf, a corner of that bay. Every deep-space voyage stays alive because somebody cleared one locker at a time. Today's somebody is you.'",
+          "minimal": "The starship Meridian runs on order — three hundred souls breathing recycled air, every cubic meter accounted for. Quartermaster Vex slaps a manifest into your chest. 'Deck C, Locker Seven. One storage bay, choked with dead equipment nobody's touched since launch. Clear one small area — a drawer, a shelf, a corner of that bay. Every deep-space voyage stays alive because somebody cleared one locker at a time. Today's somebody is you.'",
+          "productivity": "The starship Meridian runs on order — three hundred souls breathing recycled air, every cubic meter accounted for. Quartermaster Vex slaps a manifest into your chest. 'Deck C, Locker Seven. One storage bay, choked with dead equipment nobody's touched since launch. Clear one small area — a drawer, a shelf, a corner of that bay. Every deep-space voyage stays alive because somebody cleared one locker at a time. Today's somebody is you.'"
+        },
+        "outcomes": {
+          "complete": {
+            "text": "The surface gleams.",
+            "title": "Surface Clearer",
+            "xp": 100,
+            "emoji": "✨"
+          },
+          "partial": {
+            "text": "You made real progress.",
+            "title": "Dust Disturber",
+            "xp": 20,
+            "emoji": "🧹"
+          },
+          "skip": {
+            "text": "Clutter remains today.",
+            "title": null,
+            "xp": 0,
+            "emoji": "🕰️"
+          }
+        }
+      },
+      {
+        "id": 2,
+        "task": "Remove at least 10 items",
+        "hint": "Donate, trash or recycle",
+        "max": 10,
+        "chapter": "Chapter II — The Jettison Quota",
+        "story": {
+          "default": "Vex inspects your cleared locker, then starts pulling items off the shelves — cracked tablets, frayed cables, a mug with no handle. 'Dead weight,' she declares. 'Here's your quota: ten items. Anything you haven't touched since launch goes out the airlock. Don't mourn it — mass is fuel, and sentiment doesn't keep the ship flying. Ten items. The airlock cycles at dusk.'",
+          "stress": "Vex inspects your cleared locker, then starts pulling items off the shelves — cracked tablets, frayed cables, a mug with no handle. 'Dead weight,' she declares. 'Here's your quota: ten items. Anything you haven't touched since launch goes out the airlock. Don't mourn it — mass is fuel, and sentiment doesn't keep the ship flying. Ten items. The airlock cycles at dusk.'",
+          "move": "Vex inspects your cleared locker, then starts pulling items off the shelves — cracked tablets, frayed cables, a mug with no handle. 'Dead weight,' she declares. 'Here's your quota: ten items. Anything you haven't touched since launch goes out the airlock. Don't mourn it — mass is fuel, and sentiment doesn't keep the ship flying. Ten items. The airlock cycles at dusk.'",
+          "minimal": "Vex inspects your cleared locker, then starts pulling items off the shelves — cracked tablets, frayed cables, a mug with no handle. 'Dead weight,' she declares. 'Here's your quota: ten items. Anything you haven't touched since launch goes out the airlock. Don't mourn it — mass is fuel, and sentiment doesn't keep the ship flying. Ten items. The airlock cycles at dusk.'",
+          "productivity": "Vex inspects your cleared locker, then starts pulling items off the shelves — cracked tablets, frayed cables, a mug with no handle. 'Dead weight,' she declares. 'Here's your quota: ten items. Anything you haven't touched since launch goes out the airlock. Don't mourn it — mass is fuel, and sentiment doesn't keep the ship flying. Ten items. The airlock cycles at dusk.'"
+        },
+        "outcomes": {
+          "complete": {
+            "text": "Ten items left. Space appears.",
+            "title": "Release Keeper",
+            "xp": 50,
+            "emoji": "📦"
+          },
+          "partial": {
+            "text": "You released some items.",
+            "title": "Gentle Releaser",
+            "xp": 25,
+            "emoji": "🍃"
+          },
+          "skip": {
+            "text": "Nothing left today.",
+            "title": null,
+            "xp": 0,
+            "emoji": "🪨"
+          }
+        }
+      },
+      {
+        "id": 3,
+        "task": "Focused 25-40 min declutter session",
+        "hint": "One room or category",
+        "max": 1,
+        "chapter": "Chapter III — Storm Protocol",
+        "story": {
+          "default": "Red lights. Klaxons. A solar storm is twelve hours out, and loose cargo becomes shrapnel at these velocities. Vex's voice crackles over comms: 'Storm protocol! One focused shift — twenty-five to forty minutes — secure an entire section. Everything strapped, sorted, or jettisoned. The Meridian's hull is counting on your hands.' The clock is running.",
+          "stress": "Red lights. Klaxons. A solar storm is twelve hours out, and loose cargo becomes shrapnel at these velocities. Vex's voice crackles over comms: 'Storm protocol! One focused shift — twenty-five to forty minutes — secure an entire section. Everything strapped, sorted, or jettisoned. The Meridian's hull is counting on your hands.' The clock is running.",
+          "move": "Red lights. Klaxons. A solar storm is twelve hours out, and loose cargo becomes shrapnel at these velocities. Vex's voice crackles over comms: 'Storm protocol! One focused shift — twenty-five to forty minutes — secure an entire section. Everything strapped, sorted, or jettisoned. The Meridian's hull is counting on your hands.' The clock is running.",
+          "minimal": "Red lights. Klaxons. A solar storm is twelve hours out, and loose cargo becomes shrapnel at these velocities. Vex's voice crackles over comms: 'Storm protocol! One focused shift — twenty-five to forty minutes — secure an entire section. Everything strapped, sorted, or jettisoned. The Meridian's hull is counting on your hands.' The clock is running.",
+          "productivity": "Red lights. Klaxons. A solar storm is twelve hours out, and loose cargo becomes shrapnel at these velocities. Vex's voice crackles over comms: 'Storm protocol! One focused shift — twenty-five to forty minutes — secure an entire section. Everything strapped, sorted, or jettisoned. The Meridian's hull is counting on your hands.' The clock is running."
+        },
+        "outcomes": {
+          "complete": {
+            "text": "The space feels more like yours.",
+            "title": "Room Reclaimer",
+            "xp": 55,
+            "emoji": "🏰"
+          },
+          "partial": {
+            "text": "You gave real effort.",
+            "title": "Steady Hand",
+            "xp": 25,
+            "emoji": "🛠️"
+          },
+          "skip": {
+            "text": "Deeper rooms wait.",
+            "title": null,
+            "xp": 0,
+            "emoji": "🌙"
+          }
+        }
+      },
+      {
+        "id": 4,
+        "task": "Quick maintenance + appreciate for 2 min",
+        "hint": "Even 10 minutes counts",
+        "max": 1,
+        "chapter": "Chapter IV — The Captain’s Walk",
+        "story": {
+          "default": "The storm passed. The Meridian held. Now Captain Okafor does the traditional walkthrough — and she's coming to your section. Do a quick maintenance pass: straighten what's shifted, clear what's drifted. Then stand in your bay for two full minutes and appreciate it. 'Even captains do this,' Okafor says quietly beside you. 'Order you can see is order you can trust.'",
+          "stress": "The storm passed. The Meridian held. Now Captain Okafor does the traditional walkthrough — and she's coming to your section. Do a quick maintenance pass: straighten what's shifted, clear what's drifted. Then stand in your bay for two full minutes and appreciate it. 'Even captains do this,' Okafor says quietly beside you. 'Order you can see is order you can trust.'",
+          "move": "The storm passed. The Meridian held. Now Captain Okafor does the traditional walkthrough — and she's coming to your section. Do a quick maintenance pass: straighten what's shifted, clear what's drifted. Then stand in your bay for two full minutes and appreciate it. 'Even captains do this,' Okafor says quietly beside you. 'Order you can see is order you can trust.'",
+          "minimal": "The storm passed. The Meridian held. Now Captain Okafor does the traditional walkthrough — and she's coming to your section. Do a quick maintenance pass: straighten what's shifted, clear what's drifted. Then stand in your bay for two full minutes and appreciate it. 'Even captains do this,' Okafor says quietly beside you. 'Order you can see is order you can trust.'",
+          "productivity": "The storm passed. The Meridian held. Now Captain Okafor does the traditional walkthrough — and she's coming to your section. Do a quick maintenance pass: straighten what's shifted, clear what's drifted. Then stand in your bay for two full minutes and appreciate it. 'Even captains do this,' Okafor says quietly beside you. 'Order you can see is order you can trust.'"
+        },
+        "outcomes": {
+          "complete": {
+            "text": "You protected the progress.",
+            "title": "Space Guardian",
+            "xp": 65,
+            "emoji": "🛡️"
+          },
+          "partial": {
+            "text": "You did part of it.",
+            "title": "Caretaker",
+            "xp": 20,
+            "emoji": "🪴"
+          },
+          "skip": {
+            "text": "Maintenance waited.",
+            "title": null,
+            "xp": 0,
+            "emoji": "🕯️"
+          }
+        }
+      },
+      {
+        "id": 5,
+        "task": "Create one rule that protects the space",
+        "hint": "Example: nothing on desk overnight",
+        "max": 1,
+        "chapter": "Chapter V — Ship’s Law",
+        "story": {
+          "default": "Vex meets you at the airlock with a brass plaque and an engraving tool. 'Every clean ship in the fleet has one law,' she says. 'Not ten. One.' Create the single rule that protects your space on every voyage from here — the line that keeps the bay clear when no one's watching. Engrave it. Mount it. Ship's law is forever.",
+          "stress": "Vex meets you at the airlock with a brass plaque and an engraving tool. 'Every clean ship in the fleet has one law,' she says. 'Not ten. One.' Create the single rule that protects your space on every voyage from here — the line that keeps the bay clear when no one's watching. Engrave it. Mount it. Ship's law is forever.",
+          "move": "Vex meets you at the airlock with a brass plaque and an engraving tool. 'Every clean ship in the fleet has one law,' she says. 'Not ten. One.' Create the single rule that protects your space on every voyage from here — the line that keeps the bay clear when no one's watching. Engrave it. Mount it. Ship's law is forever.",
+          "minimal": "Vex meets you at the airlock with a brass plaque and an engraving tool. 'Every clean ship in the fleet has one law,' she says. 'Not ten. One.' Create the single rule that protects your space on every voyage from here — the line that keeps the bay clear when no one's watching. Engrave it. Mount it. Ship's law is forever.",
+          "productivity": "Vex meets you at the airlock with a brass plaque and an engraving tool. 'Every clean ship in the fleet has one law,' she says. 'Not ten. One.' Create the single rule that protects your space on every voyage from here — the line that keeps the bay clear when no one's watching. Engrave it. Mount it. Ship's law is forever."
+        },
+        "outcomes": {
+          "complete": {
+            "text": "You set a new standard.",
+            "title": "Order Keeper",
+            "xp": 75,
+            "emoji": "📜"
+          },
+          "partial": {
+            "text": "You thought about the rule.",
+            "title": "Almost Settled",
+            "xp": 20,
+            "emoji": "✍️"
+          },
+          "skip": {
+            "text": "Rule remains unwritten.",
+            "title": null,
+            "xp": 0,
+            "emoji": "⏳"
+          }
+        }
+      }
+    ],
+    "fitness": [
+      {
+        "id": 1,
+        "task": "Move for 15-20 minutes",
+        "hint": "Walk, exercise, stretch, dance",
+        "max": 1,
+        "chapter": "Chapter I — First Ride",
+        "story": {
+          "default": "Foreman Ada looks you up and down at the ranch gate, unimpressed. 'Cattle drive leaves at dawn, and nobody rides soft.' She tosses you a canteen. 'Fifteen to twenty minutes on the trail today — walk, jog, move. Don't matter how fast. The herd won't wait for sore legs, and neither will I.' The trail dusts your boots. Time to move.",
+          "energy": "Foreman Ada looks you up and down at the ranch gate, unimpressed. 'Cattle drive leaves at dawn, and nobody rides soft.' She tosses you a canteen. 'Fifteen to twenty minutes on the trail today — walk, jog, move. Don't matter how fast. The herd won't wait for sore legs, and neither will I.' The trail dusts your boots. Time to move.",
+          "strength": "Foreman Ada looks you up and down at the ranch gate, unimpressed. 'Cattle drive leaves at dawn, and nobody rides soft.' She tosses you a canteen. 'Fifteen to twenty minutes on the trail today — walk, jog, move. Don't matter how fast. The herd won't wait for sore legs, and neither will I.' The trail dusts your boots. Time to move.",
+          "health": "Foreman Ada looks you up and down at the ranch gate, unimpressed. 'Cattle drive leaves at dawn, and nobody rides soft.' She tosses you a canteen. 'Fifteen to twenty minutes on the trail today — walk, jog, move. Don't matter how fast. The herd won't wait for sore legs, and neither will I.' The trail dusts your boots. Time to move.",
+          "mood": "Foreman Ada looks you up and down at the ranch gate, unimpressed. 'Cattle drive leaves at dawn, and nobody rides soft.' She tosses you a canteen. 'Fifteen to twenty minutes on the trail today — walk, jog, move. Don't matter how fast. The herd won't wait for sore legs, and neither will I.' The trail dusts your boots. Time to move."
+        },
+        "outcomes": {
+          "complete": {
+            "text": "You moved. Momentum started.",
+            "title": "First Step",
+            "xp": 100,
+            "emoji": "👟"
+          },
+          "partial": {
+            "text": "You did something.",
+            "title": "Mover",
+            "xp": 20,
+            "emoji": "🏃"
+          },
+          "skip": {
+            "text": "Grounds stayed empty.",
+            "title": null,
+            "xp": 0,
+            "emoji": "🌫️"
+          }
+        }
+      },
+      {
+        "id": 2,
+        "task": "Another movement session",
+        "hint": "20+ minutes preferred",
+        "max": 1,
+        "chapter": "Chapter II — Back in the Saddle",
+        "story": {
+          "default": "'You're walking like a newborn calf,' Ada observes, 'but you're walking.' She saddles up beside you. 'One ride don't make a rider. Move again today — same trail or a new one, your call. Legs learn by repetition, not by speeches.' The sun's barely up. The trail's waiting.",
+          "energy": "'You're walking like a newborn calf,' Ada observes, 'but you're walking.' She saddles up beside you. 'One ride don't make a rider. Move again today — same trail or a new one, your call. Legs learn by repetition, not by speeches.' The sun's barely up. The trail's waiting.",
+          "strength": "'You're walking like a newborn calf,' Ada observes, 'but you're walking.' She saddles up beside you. 'One ride don't make a rider. Move again today — same trail or a new one, your call. Legs learn by repetition, not by speeches.' The sun's barely up. The trail's waiting.",
+          "health": "'You're walking like a newborn calf,' Ada observes, 'but you're walking.' She saddles up beside you. 'One ride don't make a rider. Move again today — same trail or a new one, your call. Legs learn by repetition, not by speeches.' The sun's barely up. The trail's waiting.",
+          "mood": "'You're walking like a newborn calf,' Ada observes, 'but you're walking.' She saddles up beside you. 'One ride don't make a rider. Move again today — same trail or a new one, your call. Legs learn by repetition, not by speeches.' The sun's barely up. The trail's waiting."
+        },
+        "outcomes": {
+          "complete": {
+            "text": "Two sessions. Habit forming.",
+            "title": "Consistent Mover",
+            "xp": 45,
+            "emoji": "🔥"
+          },
+          "partial": {
+            "text": "You showed up again.",
+            "title": "Returner",
+            "xp": 20,
+            "emoji": "🔄"
+          },
+          "skip": {
+            "text": "Rest day.",
+            "title": null,
+            "xp": 0,
+            "emoji": "🍃"
+          }
+        }
+      },
+      {
+        "id": 3,
+        "task": "Do a moderately challenging session",
+        "hint": "Add intensity or time",
+        "max": 1,
+        "chapter": "Chapter III — The Canyon Crossing",
+        "story": {
+          "default": "A storm split the herd across the canyon in the night. Ada hands you the reins, her face serious. 'This one's a real ride — moderately challenging, not reckless. Push yourself harder than comfortable, but the canyon doesn't forgive show-offs. Steady hands, steady breath. Bring them home.' The canyon yawns below. Ride.",
+          "energy": "A storm split the herd across the canyon in the night. Ada hands you the reins, her face serious. 'This one's a real ride — moderately challenging, not reckless. Push yourself harder than comfortable, but the canyon doesn't forgive show-offs. Steady hands, steady breath. Bring them home.' The canyon yawns below. Ride.",
+          "strength": "A storm split the herd across the canyon in the night. Ada hands you the reins, her face serious. 'This one's a real ride — moderately challenging, not reckless. Push yourself harder than comfortable, but the canyon doesn't forgive show-offs. Steady hands, steady breath. Bring them home.' The canyon yawns below. Ride.",
+          "health": "A storm split the herd across the canyon in the night. Ada hands you the reins, her face serious. 'This one's a real ride — moderately challenging, not reckless. Push yourself harder than comfortable, but the canyon doesn't forgive show-offs. Steady hands, steady breath. Bring them home.' The canyon yawns below. Ride.",
+          "mood": "A storm split the herd across the canyon in the night. Ada hands you the reins, her face serious. 'This one's a real ride — moderately challenging, not reckless. Push yourself harder than comfortable, but the canyon doesn't forgive show-offs. Steady hands, steady breath. Bring them home.' The canyon yawns below. Ride."
+        },
+        "outcomes": {
+          "complete": {
+            "text": "You pushed. Body adapts.",
+            "title": "Challenger",
+            "xp": 55,
+            "emoji": "💪"
+          },
+          "partial": {
+            "text": "You attempted it.",
+            "title": "Tryer",
+            "xp": 25,
+            "emoji": "⚔️"
+          },
+          "skip": {
+            "text": "Challenge waits.",
+            "title": null,
+            "xp": 0,
+            "emoji": "🛡️"
+          }
+        }
+      },
+      {
+        "id": 4,
+        "task": "After moving, notice how you feel for 5 min",
+        "hint": "Just observe, no judgment",
+        "max": 1,
+        "chapter": "Chapter IV — Coffee at Camp",
+        "story": {
+          "default": "Back at camp, the herd settled, Ada pours two tin cups of coffee and hands you one. 'Sit,' she says. 'Five minutes. Notice how your body feels different than this morning — the looseness in your shoulders, the air in your lungs. That's the trail paying you back. Riders who never notice never last.' The fire crackles. Notice.",
+          "energy": "Back at camp, the herd settled, Ada pours two tin cups of coffee and hands you one. 'Sit,' she says. 'Five minutes. Notice how your body feels different than this morning — the looseness in your shoulders, the air in your lungs. That's the trail paying you back. Riders who never notice never last.' The fire crackles. Notice.",
+          "strength": "Back at camp, the herd settled, Ada pours two tin cups of coffee and hands you one. 'Sit,' she says. 'Five minutes. Notice how your body feels different than this morning — the looseness in your shoulders, the air in your lungs. That's the trail paying you back. Riders who never notice never last.' The fire crackles. Notice.",
+          "health": "Back at camp, the herd settled, Ada pours two tin cups of coffee and hands you one. 'Sit,' she says. 'Five minutes. Notice how your body feels different than this morning — the looseness in your shoulders, the air in your lungs. That's the trail paying you back. Riders who never notice never last.' The fire crackles. Notice.",
+          "mood": "Back at camp, the herd settled, Ada pours two tin cups of coffee and hands you one. 'Sit,' she says. 'Five minutes. Notice how your body feels different than this morning — the looseness in your shoulders, the air in your lungs. That's the trail paying you back. Riders who never notice never last.' The fire crackles. Notice."
+        },
+        "outcomes": {
+          "complete": {
+            "text": "You paid attention.",
+            "title": "Body Listener",
+            "xp": 40,
+            "emoji": "🧠"
+          },
+          "partial": {
+            "text": "You noticed something.",
+            "title": "Aware",
+            "xp": 15,
+            "emoji": "👁️"
+          },
+          "skip": {
+            "text": "Awareness waits.",
+            "title": null,
+            "xp": 0,
+            "emoji": "🌙"
+          }
+        }
+      },
+      {
+        "id": 5,
+        "task": "Write one fitness rule for next 7 days",
+        "hint": "Example: move 20 min daily",
+        "max": 1,
+        "chapter": "Chapter V — The Bunkhouse Wall",
+        "story": {
+          "default": "On the bunkhouse wall, generations of riders have carved their names — and beneath each name, one rule. Ada hands you the knife. 'Every rider leaves one law for the next,' she says. 'Write yours — the single rule you'll ride by for the next seven days. Make it one you can keep in a storm.' The wall waits for your words.",
+          "energy": "On the bunkhouse wall, generations of riders have carved their names — and beneath each name, one rule. Ada hands you the knife. 'Every rider leaves one law for the next,' she says. 'Write yours — the single rule you'll ride by for the next seven days. Make it one you can keep in a storm.' The wall waits for your words.",
+          "strength": "On the bunkhouse wall, generations of riders have carved their names — and beneath each name, one rule. Ada hands you the knife. 'Every rider leaves one law for the next,' she says. 'Write yours — the single rule you'll ride by for the next seven days. Make it one you can keep in a storm.' The wall waits for your words.",
+          "health": "On the bunkhouse wall, generations of riders have carved their names — and beneath each name, one rule. Ada hands you the knife. 'Every rider leaves one law for the next,' she says. 'Write yours — the single rule you'll ride by for the next seven days. Make it one you can keep in a storm.' The wall waits for your words.",
+          "mood": "On the bunkhouse wall, generations of riders have carved their names — and beneath each name, one rule. Ada hands you the knife. 'Every rider leaves one law for the next,' she says. 'Write yours — the single rule you'll ride by for the next seven days. Make it one you can keep in a storm.' The wall waits for your words."
+        },
+        "outcomes": {
+          "complete": {
+            "text": "You set the rule.",
+            "title": "Practice Owner",
+            "xp": 70,
+            "emoji": "📜"
+          },
+          "partial": {
+            "text": "You thought about it.",
+            "title": "Almost Committed",
+            "xp": 20,
+            "emoji": "✍️"
+          },
+          "skip": {
+            "text": "Rule unwritten.",
+            "title": null,
+            "xp": 0,
+            "emoji": "⏳"
+          }
+        }
+      }
+    ],
+    "learning": [
+      {
+        "id": 1,
+        "task": "Learn something for 20-25 focused minutes",
+        "hint": "Video, article, book, practice",
+        "max": 1,
+        "chapter": "Chapter I — The First File",
+        "story": {
+          "default": "Rain hammers the windows of the Marlowe Detective Agency. Marlowe — trench coat, tired eyes, sharper than she looks — slides a case file across the desk. 'We don't hire amateurs. Twenty to twenty-five minutes, focused. No phone, no wandering mind. The details that crack cases hide in the boring pages, and the boring pages don't read themselves.' The file is thick. Open it.",
+          "skill": "Rain hammers the windows of the Marlowe Detective Agency. Marlowe — trench coat, tired eyes, sharper than she looks — slides a case file across the desk. 'We don't hire amateurs. Twenty to twenty-five minutes, focused. No phone, no wandering mind. The details that crack cases hide in the boring pages, and the boring pages don't read themselves.' The file is thick. Open it.",
+          "career": "Rain hammers the windows of the Marlowe Detective Agency. Marlowe — trench coat, tired eyes, sharper than she looks — slides a case file across the desk. 'We don't hire amateurs. Twenty to twenty-five minutes, focused. No phone, no wandering mind. The details that crack cases hide in the boring pages, and the boring pages don't read themselves.' The file is thick. Open it.",
+          "curiosity": "Rain hammers the windows of the Marlowe Detective Agency. Marlowe — trench coat, tired eyes, sharper than she looks — slides a case file across the desk. 'We don't hire amateurs. Twenty to twenty-five minutes, focused. No phone, no wandering mind. The details that crack cases hide in the boring pages, and the boring pages don't read themselves.' The file is thick. Open it.",
+          "confidence": "Rain hammers the windows of the Marlowe Detective Agency. Marlowe — trench coat, tired eyes, sharper than she looks — slides a case file across the desk. 'We don't hire amateurs. Twenty to twenty-five minutes, focused. No phone, no wandering mind. The details that crack cases hide in the boring pages, and the boring pages don't read themselves.' The file is thick. Open it."
+        },
+        "outcomes": {
+          "complete": {
+            "text": "You began. Path opened.",
+            "title": "First Reader",
+            "xp": 100,
+            "emoji": "📖"
+          },
+          "partial": {
+            "text": "You started.",
+            "title": "Beginner",
+            "xp": 20,
+            "emoji": "🌱"
+          },
+          "skip": {
+            "text": "Library stayed quiet.",
+            "title": null,
+            "xp": 0,
+            "emoji": "🕯️"
+          }
+        }
+      },
+      {
+        "id": 2,
+        "task": "Another focused learning session",
+        "hint": "20+ minutes",
+        "max": 1,
+        "chapter": "Chapter II — The Re-Read",
+        "story": {
+          "default": "'Back to the file,' Marlowe says, not looking up. 'Real detectives re-read. The clue you missed yesterday is still in there — it didn't move, you just weren't ready.' Another focused session. Same file, sharper eyes. The truth is patient; be more patient.",
+          "skill": "'Back to the file,' Marlowe says, not looking up. 'Real detectives re-read. The clue you missed yesterday is still in there — it didn't move, you just weren't ready.' Another focused session. Same file, sharper eyes. The truth is patient; be more patient.",
+          "career": "'Back to the file,' Marlowe says, not looking up. 'Real detectives re-read. The clue you missed yesterday is still in there — it didn't move, you just weren't ready.' Another focused session. Same file, sharper eyes. The truth is patient; be more patient.",
+          "curiosity": "'Back to the file,' Marlowe says, not looking up. 'Real detectives re-read. The clue you missed yesterday is still in there — it didn't move, you just weren't ready.' Another focused session. Same file, sharper eyes. The truth is patient; be more patient.",
+          "confidence": "'Back to the file,' Marlowe says, not looking up. 'Real detectives re-read. The clue you missed yesterday is still in there — it didn't move, you just weren't ready.' Another focused session. Same file, sharper eyes. The truth is patient; be more patient."
+        },
+        "outcomes": {
+          "complete": {
+            "text": "Knowledge is sticking.",
+            "title": "Steady Student",
+            "xp": 45,
+            "emoji": "📚"
+          },
+          "partial": {
+            "text": "You returned.",
+            "title": "Returner",
+            "xp": 20,
+            "emoji": "🔄"
+          },
+          "skip": {
+            "text": "Rest day for the mind.",
+            "title": null,
+            "xp": 0,
+            "emoji": "🍃"
+          }
+        }
+      },
+      {
+        "id": 3,
+        "task": "Apply what you learned for 15+ min",
+        "hint": "Write, build, solve, teach",
+        "max": 1,
+        "chapter": "Chapter III — Field Work",
+        "story": {
+          "default": "Marlowe tosses you a brass key. 'Archive room. Theory's done — now apply it. Fifteen minutes minimum: file it, use it, test it against a real case. Knowledge that never leaves the folder is just paper, and paper doesn't solve anything.' The archive door clicks open.",
+          "skill": "Marlowe tosses you a brass key. 'Archive room. Theory's done — now apply it. Fifteen minutes minimum: file it, use it, test it against a real case. Knowledge that never leaves the folder is just paper, and paper doesn't solve anything.' The archive door clicks open.",
+          "career": "Marlowe tosses you a brass key. 'Archive room. Theory's done — now apply it. Fifteen minutes minimum: file it, use it, test it against a real case. Knowledge that never leaves the folder is just paper, and paper doesn't solve anything.' The archive door clicks open.",
+          "curiosity": "Marlowe tosses you a brass key. 'Archive room. Theory's done — now apply it. Fifteen minutes minimum: file it, use it, test it against a real case. Knowledge that never leaves the folder is just paper, and paper doesn't solve anything.' The archive door clicks open.",
+          "confidence": "Marlowe tosses you a brass key. 'Archive room. Theory's done — now apply it. Fifteen minutes minimum: file it, use it, test it against a real case. Knowledge that never leaves the folder is just paper, and paper doesn't solve anything.' The archive door clicks open."
+        },
+        "outcomes": {
+          "complete": {
+            "text": "Knowledge became experience.",
+            "title": "Applier",
+            "xp": 55,
+            "emoji": "🛠️"
+          },
+          "partial": {
+            "text": "You tried applying it.",
+            "title": "Experimenter",
+            "xp": 25,
+            "emoji": "🔬"
+          },
+          "skip": {
+            "text": "Application waits.",
+            "title": null,
+            "xp": 0,
+            "emoji": "⏳"
+          }
+        }
+      },
+      {
+        "id": 4,
+        "task": "Write 3-5 short notes about what you noticed",
+        "hint": "Notes app or paper",
+        "max": 1,
+        "chapter": "Chapter IV — The Case Board",
+        "story": {
+          "default": "Marlowe taps the corkboard covered in photos and string. 'Write it down. Three to five notes — what surprised you, what connects to what. A detective's memory is only as good as her notebook, and notebooks don't lie to themselves.' The pins are waiting.",
+          "skill": "Marlowe taps the corkboard covered in photos and string. 'Write it down. Three to five notes — what surprised you, what connects to what. A detective's memory is only as good as her notebook, and notebooks don't lie to themselves.' The pins are waiting.",
+          "career": "Marlowe taps the corkboard covered in photos and string. 'Write it down. Three to five notes — what surprised you, what connects to what. A detective's memory is only as good as her notebook, and notebooks don't lie to themselves.' The pins are waiting.",
+          "curiosity": "Marlowe taps the corkboard covered in photos and string. 'Write it down. Three to five notes — what surprised you, what connects to what. A detective's memory is only as good as her notebook, and notebooks don't lie to themselves.' The pins are waiting.",
+          "confidence": "Marlowe taps the corkboard covered in photos and string. 'Write it down. Three to five notes — what surprised you, what connects to what. A detective's memory is only as good as her notebook, and notebooks don't lie to themselves.' The pins are waiting."
+        },
+        "outcomes": {
+          "complete": {
+            "text": "You captured the insight.",
+            "title": "Reflector",
+            "xp": 40,
+            "emoji": "📝"
+          },
+          "partial": {
+            "text": "You thought about it.",
+            "title": "Noticer",
+            "xp": 15,
+            "emoji": "👁️"
+          },
+          "skip": {
+            "text": "Reflection waits.",
+            "title": null,
+            "xp": 0,
+            "emoji": "🌙"
+          }
+        }
+      },
+      {
+        "id": 5,
+        "task": "Set one learning rule for next 7 days",
+        "hint": "Example: 20 min every weekday",
+        "max": 1,
+        "chapter": "Chapter V — The License",
+        "story": {
+          "default": "Marlowe stamps a license with your name on it and slides it over. 'Last thing. Every good detective has one rule about how they learn — when, where, how deep. Set yours. For the next seven days, it's agency policy, and I enforce policy.' The stamp is still wet.",
+          "skill": "Marlowe stamps a license with your name on it and slides it over. 'Last thing. Every good detective has one rule about how they learn — when, where, how deep. Set yours. For the next seven days, it's agency policy, and I enforce policy.' The stamp is still wet.",
+          "career": "Marlowe stamps a license with your name on it and slides it over. 'Last thing. Every good detective has one rule about how they learn — when, where, how deep. Set yours. For the next seven days, it's agency policy, and I enforce policy.' The stamp is still wet.",
+          "curiosity": "Marlowe stamps a license with your name on it and slides it over. 'Last thing. Every good detective has one rule about how they learn — when, where, how deep. Set yours. For the next seven days, it's agency policy, and I enforce policy.' The stamp is still wet.",
+          "confidence": "Marlowe stamps a license with your name on it and slides it over. 'Last thing. Every good detective has one rule about how they learn — when, where, how deep. Set yours. For the next seven days, it's agency policy, and I enforce policy.' The stamp is still wet."
+        },
+        "outcomes": {
+          "complete": {
+            "text": "You took ownership.",
+            "title": "Learning Owner",
+            "xp": 70,
+            "emoji": "🎓"
+          },
+          "partial": {
+            "text": "You considered the rule.",
+            "title": "Almost Owner",
+            "xp": 20,
+            "emoji": "✍️"
+          },
+          "skip": {
+            "text": "Rule unwritten.",
+            "title": null,
+            "xp": 0,
+            "emoji": "📜"
+          }
+        }
+      }
+    ],
+    "habits": [
+      {
+        "id": 1,
+        "task": "Do one tiny habit today",
+        "hint": "Make bed, drink water, 5-min stretch",
+        "max": 1,
+        "chapter": "Chapter I — Moonseed",
+        "story": {
+          "default": "Behind the cottage, the garden spirit Pip — no taller than a watering can — tends a plot of moonseed, a plant that only grows for gardeners who show up daily. 'Just one tiny tending today,' Pip says. 'Moonseed doesn't care how much you do. Only that you came.' The soil is soft. The sun is out. Tend one tiny thing.",
+          "consistency": "Behind the cottage, the garden spirit Pip — no taller than a watering can — tends a plot of moonseed, a plant that only grows for gardeners who show up daily. 'Just one tiny tending today,' Pip says. 'Moonseed doesn't care how much you do. Only that you came.' The soil is soft. The sun is out. Tend one tiny thing.",
+          "morning": "Behind the cottage, the garden spirit Pip — no taller than a watering can — tends a plot of moonseed, a plant that only grows for gardeners who show up daily. 'Just one tiny tending today,' Pip says. 'Moonseed doesn't care how much you do. Only that you came.' The soil is soft. The sun is out. Tend one tiny thing.",
+          "focus": "Behind the cottage, the garden spirit Pip — no taller than a watering can — tends a plot of moonseed, a plant that only grows for gardeners who show up daily. 'Just one tiny tending today,' Pip says. 'Moonseed doesn't care how much you do. Only that you came.' The soil is soft. The sun is out. Tend one tiny thing.",
+          "selfcare": "Behind the cottage, the garden spirit Pip — no taller than a watering can — tends a plot of moonseed, a plant that only grows for gardeners who show up daily. 'Just one tiny tending today,' Pip says. 'Moonseed doesn't care how much you do. Only that you came.' The soil is soft. The sun is out. Tend one tiny thing."
+        },
+        "outcomes": {
+          "complete": {
+            "text": "You kept the promise.",
+            "title": "Promise Keeper",
+            "xp": 100,
+            "emoji": "🪨"
+          },
+          "partial": {
+            "text": "You partially did it.",
+            "title": "Starter",
+            "xp": 20,
+            "emoji": "🌱"
+          },
+          "skip": {
+            "text": "Habit waits.",
+            "title": null,
+            "xp": 0,
+            "emoji": "🌫️"
+          }
+        }
+      },
+      {
+        "id": 2,
+        "task": "Do the same tiny habit again",
+        "hint": "Same action is best",
+        "max": 1,
+        "chapter": "Chapter II — The Second Morning",
+        "story": {
+          "default": "Pip is already in the garden at dawn, humming. 'Again,' the spirit says cheerfully. 'Same tending, same spot. Moonseed trusts routine more than enthusiasm — enthusiasm sleeps in, routine shows up.' The watering can is where you left it.",
+          "consistency": "Pip is already in the garden at dawn, humming. 'Again,' the spirit says cheerfully. 'Same tending, same spot. Moonseed trusts routine more than enthusiasm — enthusiasm sleeps in, routine shows up.' The watering can is where you left it.",
+          "morning": "Pip is already in the garden at dawn, humming. 'Again,' the spirit says cheerfully. 'Same tending, same spot. Moonseed trusts routine more than enthusiasm — enthusiasm sleeps in, routine shows up.' The watering can is where you left it.",
+          "focus": "Pip is already in the garden at dawn, humming. 'Again,' the spirit says cheerfully. 'Same tending, same spot. Moonseed trusts routine more than enthusiasm — enthusiasm sleeps in, routine shows up.' The watering can is where you left it.",
+          "selfcare": "Pip is already in the garden at dawn, humming. 'Again,' the spirit says cheerfully. 'Same tending, same spot. Moonseed trusts routine more than enthusiasm — enthusiasm sleeps in, routine shows up.' The watering can is where you left it."
+        },
+        "outcomes": {
+          "complete": {
+            "text": "Two days. Chain started.",
+            "title": "Chain Starter",
+            "xp": 45,
+            "emoji": "🔗"
+          },
+          "partial": {
+            "text": "You returned.",
+            "title": "Returner",
+            "xp": 20,
+            "emoji": "🔄"
+          },
+          "skip": {
+            "text": "Break in the chain.",
+            "title": null,
+            "xp": 0,
+            "emoji": "🍃"
+          }
+        }
+      },
+      {
+        "id": 3,
+        "task": "Make the habit easier in your environment",
+        "hint": "Lay clothes out, put book on pillow, etc.",
+        "max": 1,
+        "chapter": "Chapter III — The Shorter Spout",
+        "story": {
+          "default": "Pip hands you a watering can with a shorter spout and moves your tools beside the garden gate. 'Make it easier on yourself,' the spirit says. 'Clear the path, move things closer. A gardener who fights their own garden won't last the season — but one who smooths the way lasts for years.' Rearrange one thing tonight.",
+          "consistency": "Pip hands you a watering can with a shorter spout and moves your tools beside the garden gate. 'Make it easier on yourself,' the spirit says. 'Clear the path, move things closer. A gardener who fights their own garden won't last the season — but one who smooths the way lasts for years.' Rearrange one thing tonight.",
+          "morning": "Pip hands you a watering can with a shorter spout and moves your tools beside the garden gate. 'Make it easier on yourself,' the spirit says. 'Clear the path, move things closer. A gardener who fights their own garden won't last the season — but one who smooths the way lasts for years.' Rearrange one thing tonight.",
+          "focus": "Pip hands you a watering can with a shorter spout and moves your tools beside the garden gate. 'Make it easier on yourself,' the spirit says. 'Clear the path, move things closer. A gardener who fights their own garden won't last the season — but one who smooths the way lasts for years.' Rearrange one thing tonight.",
+          "selfcare": "Pip hands you a watering can with a shorter spout and moves your tools beside the garden gate. 'Make it easier on yourself,' the spirit says. 'Clear the path, move things closer. A gardener who fights their own garden won't last the season — but one who smooths the way lasts for years.' Rearrange one thing tonight."
+        },
+        "outcomes": {
+          "complete": {
+            "text": "Friction reduced. Habit stronger.",
+            "title": "Environment Shaper",
+            "xp": 50,
+            "emoji": "🛠️"
+          },
+          "partial": {
+            "text": "You made a small change.",
+            "title": "Adjuster",
+            "xp": 20,
+            "emoji": "🔧"
+          },
+          "skip": {
+            "text": "Environment unchanged.",
+            "title": null,
+            "xp": 0,
+            "emoji": "🏠"
+          }
+        }
+      },
+      {
+        "id": 4,
+        "task": "Create a simple way to track the habit",
+        "hint": "Calendar, note, or paper tally",
+        "max": 1,
+        "chapter": "Chapter IV — Marks on the Fence",
+        "story": {
+          "default": "'Here,' Pip says, handing you chalk. 'Mark the fence post — one mark each day you tend. The fence remembers what the mind forgets, and on the grey days you'll look at those marks and know: I am someone who shows up.' The fence post is blank. Make the first mark.",
+          "consistency": "'Here,' Pip says, handing you chalk. 'Mark the fence post — one mark each day you tend. The fence remembers what the mind forgets, and on the grey days you'll look at those marks and know: I am someone who shows up.' The fence post is blank. Make the first mark.",
+          "morning": "'Here,' Pip says, handing you chalk. 'Mark the fence post — one mark each day you tend. The fence remembers what the mind forgets, and on the grey days you'll look at those marks and know: I am someone who shows up.' The fence post is blank. Make the first mark.",
+          "focus": "'Here,' Pip says, handing you chalk. 'Mark the fence post — one mark each day you tend. The fence remembers what the mind forgets, and on the grey days you'll look at those marks and know: I am someone who shows up.' The fence post is blank. Make the first mark.",
+          "selfcare": "'Here,' Pip says, handing you chalk. 'Mark the fence post — one mark each day you tend. The fence remembers what the mind forgets, and on the grey days you'll look at those marks and know: I am someone who shows up.' The fence post is blank. Make the first mark."
+        },
+        "outcomes": {
+          "complete": {
+            "text": "You built the mirror.",
+            "title": "Tracker",
+            "xp": 45,
+            "emoji": "📊"
+          },
+          "partial": {
+            "text": "You started tracking.",
+            "title": "Recorder",
+            "xp": 20,
+            "emoji": "✏️"
+          },
+          "skip": {
+            "text": "Tracking can wait.",
+            "title": null,
+            "xp": 0,
+            "emoji": "⏳"
+          }
+        }
+      },
+      {
+        "id": 5,
+        "task": "Write an identity statement + do the habit",
+        "hint": "“I am someone who…”",
+        "max": 1,
+        "chapter": "Chapter V — The Bloom",
+        "story": {
+          "default": "The moonseed blooms — silver petals opening all at once, filling the garden with light. Pip bows low. 'One last thing, gardener. Say who you are now. Write it — I am someone who tends the garden — say it aloud, then tend once more. The garden grows gardeners, too.' The chalk is in your hand.",
+          "consistency": "The moonseed blooms — silver petals opening all at once, filling the garden with light. Pip bows low. 'One last thing, gardener. Say who you are now. Write it — I am someone who tends the garden — say it aloud, then tend once more. The garden grows gardeners, too.' The chalk is in your hand.",
+          "morning": "The moonseed blooms — silver petals opening all at once, filling the garden with light. Pip bows low. 'One last thing, gardener. Say who you are now. Write it — I am someone who tends the garden — say it aloud, then tend once more. The garden grows gardeners, too.' The chalk is in your hand.",
+          "focus": "The moonseed blooms — silver petals opening all at once, filling the garden with light. Pip bows low. 'One last thing, gardener. Say who you are now. Write it — I am someone who tends the garden — say it aloud, then tend once more. The garden grows gardeners, too.' The chalk is in your hand.",
+          "selfcare": "The moonseed blooms — silver petals opening all at once, filling the garden with light. Pip bows low. 'One last thing, gardener. Say who you are now. Write it — I am someone who tends the garden — say it aloud, then tend once more. The garden grows gardeners, too.' The chalk is in your hand."
+        },
+        "outcomes": {
+          "complete": {
+            "text": "Identity claimed and backed by action.",
+            "title": "Identity Shifter",
+            "xp": 75,
+            "emoji": "🦋"
+          },
+          "partial": {
+            "text": "You wrote it or did the habit.",
+            "title": "Claimant",
+            "xp": 25,
+            "emoji": "🪞"
+          },
+          "skip": {
+            "text": "Identity claim waits.",
+            "title": null,
+            "xp": 0,
+            "emoji": "🌙"
+          }
+        }
+      }
+    ]
+  },
+  "themes": [
+    {
+      "id": "fantasy",
+      "name": "Fantasy Adventure",
+      "emoji": "⚔️",
+      "premium": false,
+      "productId": null,
+      "tagline": "The classic quest — included free",
+      "colors": {
+        "bg": "#f4f0e5",
+        "card": "#fffdf7",
+        "text": "#20261f",
+        "muted": "#687066",
+        "primary": "#c84f2b",
+        "primaryText": "#fffaf1",
+        "danger": "#b03a26",
+        "border": "#d8d1c1",
+        "moss": "#3f644d",
+        "mossSoft": "#dbe6d8",
+        "gold": "#9a6d1d",
+        "shadow": "rgba(42,37,27,0.13)",
+        "backdrop": "rgba(32,38,31,0.46)"
+      },
+      "storyOverrides": {}
+    },
+    {
+      "id": "space",
+      "name": "Space Odyssey",
+      "emoji": "🚀",
+      "premium": true,
+      "productId": "theme_space_odyssey",
+      "tagline": "The final frontier",
+      "colors": {
+        "bg": "#050914",
+        "card": "#0d1626",
+        "text": "#dcecff",
+        "muted": "#6f87a8",
+        "primary": "#38e1ff",
+        "primaryText": "#02141a",
+        "danger": "#ff5470",
+        "border": "#1b2f4d",
+        "moss": "#5fc1c5",
+        "mossSoft": "#172f45",
+        "gold": "#e0b75e",
+        "shadow": "rgba(0,0,0,0.42)",
+        "backdrop": "rgba(2,6,16,0.62)"
+      },
+      "storyOverrides": {
+        "fitness:1": {
+          "default": "Dawn cycle aboard the station.",
+          "energy": "Fire the thrusters — movement first.",
+          "strength": "First plate on the zero-g bar.",
+          "health": "Small burns keep the whole ship healthy.",
+          "mood": "Motion shifts the cabin mood fast."
+        },
+        "fitness:2": {
+          "default": "Second orbit. Consistency is the test.",
+          "energy": "Compound the burn.",
+          "strength": "Repeated effort builds.",
+          "health": "Small choices add up.",
+          "mood": "Second session lifts the crew mood."
+        },
+        "fitness:3": {
+          "default": "Raise the thrust.",
+          "energy": "Harder burn, more energy later.",
+          "strength": "Progress needs resistance.",
+          "health": "Heart and lungs benefit.",
+          "mood": "Stronger effort, stronger lift."
+        },
+        "fitness:4": {
+          "default": "Telemetry matters as much as thrust.",
+          "energy": "Listen to your body.",
+          "strength": "Recovery is part of growth.",
+          "health": "Attention sustains health.",
+          "mood": "Notice the mood shift."
+        },
+        "fitness:5": {
+          "default": "Claim a sustainable protocol.",
+          "energy": "Make energy gains repeatable.",
+          "strength": "Decide how to keep growing.",
+          "health": "Make health the default.",
+          "mood": "Lock in the mood tool."
+        }
+      }
+    },
+    {
+      "id": "western",
+      "name": "Wild Frontier",
+      "emoji": "🤠",
+      "premium": true,
+      "productId": "theme_wild_frontier",
+      "tagline": "Tame the frontier",
+      "colors": {
+        "bg": "#191007",
+        "card": "#2a1c0e",
+        "text": "#f7e8cf",
+        "muted": "#b09468",
+        "primary": "#d97b2b",
+        "primaryText": "#1d0f02",
+        "danger": "#e5484d",
+        "border": "#4a3320",
+        "moss": "#667044",
+        "mossSoft": "#e1d6b4",
+        "gold": "#9c681f",
+        "shadow": "rgba(71,39,18,0.25)",
+        "backdrop": "rgba(48,34,25,0.5)"
+      },
+      "storyOverrides": {
+        "fitness:1": {
+          "default": "Sunrise on the ranch.",
+          "energy": "Saddle up — movement first.",
+          "strength": "First bale on the bar.",
+          "health": "Small work keeps the ranch healthy.",
+          "mood": "Motion shifts the mood fast."
+        },
+        "fitness:2": {
+          "default": "Second day on the trail. Consistency is the test.",
+          "energy": "Keep riding.",
+          "strength": "Repeated effort builds.",
+          "health": "Small choices add up.",
+          "mood": "Second ride lifts the spirits."
+        }
+      }
+    }
+  ]
+}
