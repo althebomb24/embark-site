@@ -1118,14 +1118,19 @@
       "productId": null,
       "tagline": "The classic quest — included free",
       "colors": {
-        "bg": "#141020",
-        "card": "#221a33",
-        "text": "#f4ead8",
-        "muted": "#a89a7d",
-        "primary": "#c9962e",
-        "primaryText": "#1a1206",
-        "danger": "#e5484d",
-        "border": "#3a2f52"
+        "bg": "#f4f0e5",
+        "card": "#fffdf7",
+        "text": "#20261f",
+        "muted": "#687066",
+        "primary": "#c84f2b",
+        "primaryText": "#fffaf1",
+        "danger": "#b03a26",
+        "border": "#d8d1c1",
+        "moss": "#3f644d",
+        "mossSoft": "#dbe6d8",
+        "gold": "#9a6d1d",
+        "shadow": "rgba(42,37,27,0.13)",
+        "backdrop": "rgba(32,38,31,0.46)"
       },
       "storyOverrides": {}
     },
@@ -1144,7 +1149,12 @@
         "primary": "#38e1ff",
         "primaryText": "#02141a",
         "danger": "#ff5470",
-        "border": "#1b2f4d"
+        "border": "#1b2f4d",
+        "moss": "#5fc1c5",
+        "mossSoft": "#172f45",
+        "gold": "#e0b75e",
+        "shadow": "rgba(0,0,0,0.42)",
+        "backdrop": "rgba(2,6,16,0.62)"
       },
       "storyOverrides": {
         "fitness:1": {
@@ -1199,7 +1209,12 @@
         "primary": "#d97b2b",
         "primaryText": "#1d0f02",
         "danger": "#e5484d",
-        "border": "#4a3320"
+        "border": "#4a3320",
+        "moss": "#667044",
+        "mossSoft": "#e1d6b4",
+        "gold": "#9c681f",
+        "shadow": "rgba(71,39,18,0.25)",
+        "backdrop": "rgba(48,34,25,0.5)"
       },
       "storyOverrides": {
         "fitness:1": {
