@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cops and Robbers — Demo</title>
+<style>
+  body { margin: 0; background: linear-gradient(#dcefd2, #f4f0e5); color: #20261f; font-family: Georgia, serif; display: flex; justify-content: center; padding: 20px 10px; }
+  .panel { background: #fffdf7; border: 1px solid #d8c9a8; border-radius: 12px; padding: 22px 16px; max-width: 380px; width: 100%; text-align: center; box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
+  h1 { font-size: 24px; margin: 0 0 6px; color: #2f5d3a; letter-spacing: 0.3px; }
+  .rule { width: 60px; height: 3px; background: #c9a227; border-radius: 2px; margin: 0 auto 10px; }
+  .sub { font-family: system-ui, sans-serif; font-size: 13px; color: #687066; margin: 0 0 14px; line-height: 1.4; }
+  .board { display: grid; grid-template-columns: repeat(5, 1fr); gap: 3px; margin: 0 auto; background: #8a5a2b; border: 2px solid #8a5a2b; border-radius: 8px; padding: 3px; }
+  .cell { aspect-ratio: 1; background: #f4f0e5; border-radius: 3px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-family: system-ui, sans-serif; font-size: 10px; font-weight: 700; color: #fffdf7; }
+  .info { font-family: system-ui, sans-serif; font-size: 13px; color: #20261f; margin-top: 12px; }
+  .pieces { display: flex; gap: 10px; justify-content: center; align-items: center; margin-top: 10px; font-family: system-ui, sans-serif; font-size: 13px; }
+  .chip { display: inline-block; min-width: 64px; padding: 5px 8px; border-radius: 4px; color: #fffdf7; font-weight: 700; font-size: 12px; }
+  .chip.empty { background: #d8c9a8; color: #687066; }
+  .status { font-family: system-ui, sans-serif; font-size: 13px; font-weight: 600; color: #20261f; min-height: 36px; margin-top: 12px; line-height: 1.4; }
+  .scores { font-family: system-ui, sans-serif; font-size: 13px; color: #20261f; margin-top: 12px; line-height: 1.6; }
+  button { font-family: system-ui, sans-serif; font-size: 15px; font-weight: 700; padding: 11px 18px; border-radius: 8px; border: 1px solid #20261f; background: #20261f; color: #fffdf7; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.2); margin: 6px 4px 0; }
+  button.secondary { background: transparent; color: #20261f; }
+  .rules { font-family: system-ui, sans-serif; font-size: 12px; color: #687066; margin-top: 14px; line-height: 1.5; text-align: left; }
+  .foot { font-family: system-ui, sans-serif; font-size: 12px; color: #687066; margin-top: 10px; }
+</style>
+</head>
+<body>
+<div class="panel">
+  <h1>Cops and Robbers</h1>
+  <div class="rule"></div>
+  <p class="sub">A nostalgia rebuild. Stay alive as long as you can — place every turn, merge to keep room, and let the cops clear space for you.</p>
+  <div class="board" id="board"></div>
+  <div class="info" id="info">Turn 1 · Score 0 · Placed 0 · Cleared 0</div>
+  <div class="pieces">
+    <span>Your piece: <span class="chip" id="curChip">—</span></span>
+    <span>Held: <span class="chip empty" id="heldChip">—</span></span>
+  </div>
+  <div>
+    <button id="holdBtn">Hold / Swap</button>
+    <button id="againBtn" class="secondary">Play again</button>
+  </div>
+  <div class="status" id="status">Your turn — tap an empty square.</div>
+  <div class="scores" id="scores"></div>
+  <div class="rules">
+    <b>How it plays (from memory, gaps filled in):</b><br>
+    · Each turn you get a random piece — a mystery box, Thug most often. Thug 70%, Cop 10%, Enforcer 10%, Detective 3%, Boss 4%, Car 2%, Syndicate 1%. (Cop pieces are 15% of draws.) Mob Boss is merge-only — merge three Syndicates. You must place it, robber or cop. You also have one hold slot to stash a piece for later.<br>
+    · 3 or more connected same pieces merge into the next tier (Thug → Enforcer → Boss → Syndicate → Mob Boss; Cop → Detective → Car → Jail → …) on the square you last placed (or most recently created/moved, for cops). Merging frees space — without it you box yourself in.<br>
+    · You do not move. Only Cops move, one square at a time in a random direction; Detectives, Cars, and higher units stay put. Pieces block them — so your placements steer them.<br>
+    · Box in 1 cop by itself → Detective. 3 or more Detectives together → Cop Car. Box in 3 cops at once → Cop Car directly.<br>
+    · 3 or more Cars → Jail. 3 or more Jails → Prison, and so on up the chain (Prison → Precinct → HQ). Each jail-level unit, when formed, clears robbers around it — Jail clears the 8 touching squares, Prison clears within 2, Precinct within 3, HQ clears the whole board. Clearing helps you: it frees big space.<br>
+    · Score: +1 per piece placed, +2 per robber cleared. Game over when the board is full and you cannot place. Survive as long as you can.
+  </div>
+  <p class="foot">Demo only — same rules as the app version. Piece art is plain labels; the app shows plushy faces.</p>
+</div>
+<script>
+  var W = 5, H = 5, N = 25;
+  var ROBBER_NAMES = ['', 'Thug', 'Enforcer', 'Boss', 'Syndicate', 'Mob Boss'];
+  var ROBBER_SHORT = ['', 'THUG', 'ENF', 'BOSS', 'SYN', 'MOB'];
+  var ROBBER_COLORS = ['', '#c84f2b', '#8a5a2b', '#5a3a1a', '#9a6d1d', '#7a1f1f'];
+  var COP_NAMES = ['', 'Cop', 'Detective', 'Car', 'Jail', 'Prison', 'Precinct', 'HQ'];
+  var COP_SHORT = ['', 'COP', 'DET', 'CAR', 'JAIL', 'PRIS', 'PREC', 'HQ'];
+  var COP_COLORS = ['', '#527bb8', '#3a5a8a', '#2f4a6b', '#687066', '#4a4a4a', '#2b2b2b', '#1a1a1a'];
+  var CLEAR_DIST = { 4: 1, 5: 2, 6: 3, 7: 99 };
+  var board = [];
+  var seqCounter = 0;
+  var current = { side: 'r', tier: 1 }, held = null;
+  var score = 0, placed = 0, cleared = 0, turn = 1, over = false;
+  var statusText = '';
+  var boardEl = document.getElementById('board');
+  var infoEl = document.getElementById('info');
+  var curChip = document.getElementById('curChip');
+  var heldChip = document.getElementById('heldChip');
+  var statusEl = document.getElementById('status');
+  var PRESET_SCORES = [
+    { name: 'Pip', moves: 100, score: 100 },
+    { name: 'Celestial Whale', moves: 75, score: 75 },
+    { name: 'Atlas', moves: 50, score: 50 },
+  ];
+  var SCORE_KEY = 'copsAndRobbersHighScores';
+  function loadScores() {
+    try {
+      var raw = localStorage.getItem(SCORE_KEY);
+      if (raw) {
+        var saved = JSON.parse(raw);
+        if (Array.isArray(saved) && saved.length) return saved;
+      }
+    } catch (e) {}
+    return PRESET_SCORES.slice();
+  }
+  var highScores = loadScores();
+  function saveScores(list) {
+    try { localStorage.setItem(SCORE_KEY, JSON.stringify(list)); } catch (e) {}
+  }
+  function addHighScore(list, entry) {
+    return list.concat([entry]).sort(function (a, b) { return b.moves - a.moves; }).slice(0, 3);
+  }
+  function renderScores(highlightIdx) {
+    var el = document.getElementById('scores');
+    var html = '<b>Top 3 scores (locally, for now)</b><br>';
+    for (var k = 0; k < highScores.length; k++) {
+      var h = highScores[k];
+      var line = '#' + (k + 1) + ' ' + h.name + ' — ' + h.moves + ' moves (' + h.score + ' pts)';
+      if (k === highlightIdx) line = '<b>' + line + '</b>';
+      html += line + '<br>';
+    }
+    el.innerHTML = html;
+  }
+  renderScores(-1);
+  var cellEls = [];
+  for (var i = 0; i < N; i++) {
+    (function (idx) {
+      var el = document.createElement('div');
+      el.className = 'cell';
+      el.addEventListener('click', function () { placeAt(idx); });
+      boardEl.appendChild(el);
+      cellEls.push(el);
+    })(i);
+  }
+  function rc(i) { return [Math.floor(i / W), i % W]; }
+  function neighbors(i) {
+    var r = rc(i)[0], c = rc(i)[1], out = [];
+    if (r > 0) out.push(i - W);
+    if (r < H - 1) out.push(i + W);
+    if (c > 0) out.push(i - 1);
+    if (c < W - 1) out.push(i + 1);
+    return out;
+  }
+  function withinCheb(i, dist) {
+    var r = rc(i)[0], c = rc(i)[1], out = [];
+    for (var dr = -dist; dr <= dist; dr++) {
+      for (var dc = -dist; dc <= dist; dc++) {
+        if (!dr && !dc) continue;
+        var nr = r + dr, nc = c + dc;
+        if (nr >= 0 && nr < H && nc >= 0 && nc < W) out.push(nr * W + nc);
+      }
+    }
+    return out;
+  }
+  function drawRandom() {
+    // Mystery box: robbers 85%, cops 15%.
+    // Thug most often.
+    var r = Math.random() * 100;
+    if (r < 70) return { side: 'r', tier: 1 };
+    if (r < 80) return { side: 'c', tier: 1 };
+    if (r < 90) return { side: 'r', tier: 2 };
+    if (r < 93) return { side: 'c', tier: 2 };
+    if (r < 97) return { side: 'r', tier: 3 };
+    if (r < 99) return { side: 'c', tier: 3 };
+    return { side: 'r', tier: 4 };
+  }
+  function pieceName(pp) { return pp.side === 'r' ? ROBBER_NAMES[pp.tier] : COP_NAMES[pp.tier]; }
+  function pieceColor(pp) { return pp.side === 'r' ? ROBBER_COLORS[pp.tier] : COP_COLORS[pp.tier]; }
+  function groupOf(start, side, tier) {
+    var seen = {}, stack = [start], out = [];
+    seen[start] = true;
+    while (stack.length) {
+      var i = stack.pop();
+      out.push(i);
+      var nbs = neighbors(i);
+      for (var k = 0; k < nbs.length; k++) {
+        var nb = nbs[k], cell = board[nb];
+        if (cell && cell.side === side && cell.tier === tier && !seen[nb]) {
+          seen[nb] = true;
+          stack.push(nb);
+        }
+      }
+    }
+    return out;
+  }
+  function mergeRobbers(start) {
+    var events = [], cur = start;
+    while (true) {
+      var cell = board[cur];
+      if (!cell || cell.side !== 'r' || cell.tier >= 5) break;
+      var grp = groupOf(cur, 'r', cell.tier);
+      if (grp.length < 3) break;
+      var others = [];
+      for (var k = 0; k < grp.length; k++) {
+        if (grp[k] !== cur) others.push(grp[k]);
+      }
+      var oldTier = cell.tier;
+      for (var j = 0; j < others.length; j++) board[others[j]] = null;
+      cell.tier = oldTier + 1;
+      cell.seq = ++seqCounter;
+      events.push('3 ' + ROBBER_NAMES[oldTier] + 's → ' + ROBBER_NAMES[cell.tier] + '!');
+    }
+    return events;
+  }
+  function boxInCops() {
+    var events = [], boxed = [];
+    for (var i = 0; i < N; i++) {
+      var cell = board[i];
+      if (cell && cell.side === 'c' && cell.tier === 1) {
+        var nbs = neighbors(i), hasEmpty = false;
+        for (var k = 0; k < nbs.length; k++) {
+          if (!board[nbs[k]]) { hasEmpty = true; break; }
+        }
+        if (!hasEmpty) boxed.push(i);
+      }
+    }
+    if (!boxed.length) return events;
+    var k = 0;
+    while (k + 2 < boxed.length) {
+      var a = boxed[k], b = boxed[k + 1], c = boxed[k + 2];
+      board[a] = { side: 'c', tier: 3, seq: ++seqCounter };
+      board[b] = null;
+      board[c] = null;
+      events.push('3 cops captured at once → Cop Car!');
+      k += 3;
+    }
+    while (k < boxed.length) {
+      var i2 = boxed[k];
+      board[i2] = { side: 'c', tier: 2, seq: ++seqCounter };
+      events.push('Cop boxed in → Detective!');
+      k++;
+    }
+    return events;
+  }
+  function clearAround(centerIdx, tier) {
+    var dist = CLEAR_DIST[tier];
+    var targets = [];
+    if (dist >= 99) {
+      for (var i = 0; i < N; i++) targets.push(i);
+    } else {
+      targets = withinCheb(centerIdx, dist);
+    }
+    var n = 0;
+    for (var k = 0; k < targets.length; k++) {
+      var t = targets[k];
+      if (t === centerIdx) continue;
+      var cell = board[t];
+      if (cell && cell.side === 'r') { board[t] = null; n++; }
+    }
+    if (n > 0) { cleared += n; score += 2 * n; }
+    return n;
+  }
+  function mergeCops() {
+    var events = [];
+    while (true) {
+      var merged = false;
+      for (var tier = 2; tier <= 6; tier++) {
+        var seen = {};
+        for (var i = 0; i < N && !merged; i++) {
+          var cell = board[i];
+          if (!cell || cell.side !== 'c' || cell.tier !== tier || seen[i]) continue;
+          var grp = groupOf(i, 'c', tier);
+          for (var g = 0; g < grp.length; g++) seen[grp[g]] = true;
+          if (grp.length >= 3) {
+            var spot = grp[0];
+            for (var g2 = 0; g2 < grp.length; g2++) {
+              if (board[grp[g2]].seq > board[spot].seq) spot = grp[g2];
+            }
+            var others = [];
+            for (var g3 = 0; g3 < grp.length; g3++) {
+              if (grp[g3] !== spot) others.push(grp[g3]);
+            }
+            for (var j = 0; j < others.length; j++) board[others[j]] = null;
+            board[spot] = { side: 'c', tier: tier + 1, seq: ++seqCounter };
+            var newTier = tier + 1;
+            events.push('3 ' + COP_NAMES[tier] + 's → ' + COP_NAMES[newTier] + '!');
+            if (newTier >= 4) {
+              var n = clearAround(spot, newTier);
+              if (n > 0) events.push(COP_NAMES[newTier] + ' cleared ' + n + ' robber' + (n === 1 ? '' : 's') + '!');
+            }
+            merged = true;
+          }
+        }
+        if (merged) break;
+      }
+      if (!merged) break;
+    }
+    return events;
+  }
+  function copPhase() {
+    var e = [];
+    e = e.concat(boxInCops());
+    e = e.concat(mergeCops());
+    return e;
+  }
+  function moveCops() {
+    var snap = [];
+    for (var i = 0; i < N; i++) {
+      var cell = board[i];
+      if (cell && cell.side === 'c' && cell.tier === 1) snap.push([i, cell]);
+    }
+    for (var s = 0; s < snap.length; s++) {
+      var i2 = snap[s][0], cell2 = snap[s][1];
+      if (board[i2] !== cell2) continue;
+      var nbs = neighbors(i2), empties = [];
+      for (var k = 0; k < nbs.length; k++) {
+        if (!board[nbs[k]]) empties.push(nbs[k]);
+      }
+      if (!empties.length) continue;
+      var dest = empties[Math.floor(Math.random() * empties.length)];
+      board[dest] = cell2;
+      cell2.seq = ++seqCounter;
+      board[i2] = null;
+    }
+  }
+  function render() {
+    infoEl.textContent = 'Turn ' + turn + ' · Score ' + score + ' · Placed ' + placed + ' · Cleared ' + cleared;
+    curChip.textContent = pieceName(current);
+    curChip.style.backgroundColor = pieceColor(current);
+    curChip.className = 'chip';
+    if (held === null) {
+      heldChip.textContent = '—';
+      heldChip.className = 'chip empty';
+      heldChip.style.backgroundColor = '';
+    } else {
+      heldChip.textContent = pieceName(held);
+      heldChip.style.backgroundColor = pieceColor(held);
+      heldChip.className = 'chip';
+    }
+    statusEl.textContent = statusText;
+    for (var i = 0; i < N; i++) {
+      var el = cellEls[i], cell = board[i];
+      if (!cell) {
+        el.textContent = '';
+        el.style.backgroundColor = '#f4f0e5';
+      } else if (cell.side === 'r') {
+        el.textContent = ROBBER_SHORT[cell.tier];
+        el.style.backgroundColor = ROBBER_COLORS[cell.tier];
+      } else {
+        el.textContent = COP_SHORT[cell.tier];
+        el.style.backgroundColor = COP_COLORS[cell.tier];
+      }
+    }
+  }
+  function placeAt(i) {
+    if (over || board[i]) return;
+    board[i] = { side: current.side, tier: current.tier, seq: ++seqCounter };
+    placed++;
+    score += 1;
+    var events = [];
+    events = events.concat(mergeRobbers(i));
+    events = events.concat(copPhase());
+    moveCops();
+    events = events.concat(copPhase());
+    var hasEmpty = false;
+    for (var k = 0; k < N; k++) {
+      if (!board[k]) { hasEmpty = true; break; }
+    }
+    if (!hasEmpty) {
+      over = true;
+      events.push('Board full — game over! You survived ' + turn + ' turns.');
+      var entry = { name: 'You', moves: turn, score: score };
+      var updated = addHighScore(highScores, entry);
+      var newIdx = -1;
+      for (var hi = 0; hi < updated.length; hi++) { if (updated[hi] === entry) { newIdx = hi; break; } }
+      if (newIdx >= 0) {
+        highScores = updated;
+        saveScores(highScores);
+        events.push('New top 3! You\'re #' + (newIdx + 1) + '!');
+        renderScores(newIdx);
+      }
+    } else {
+      turn++;
+      current = drawRandom();
+    }
+    statusText = events.join(' ') + (over ? '' : ' Your turn — tap an empty square.');
+    render();
+  }
+  function holdSwap() {
+    if (over) return;
+    if (held === null) {
+      held = current;
+      current = drawRandom();
+    } else {
+      var t = current;
+      current = held;
+      held = t;
+    }
+    statusText = 'Held swapped. Your turn — tap an empty square.';
+    render();
+  }
+  function newGame() {
+    board = [];
+    for (var i = 0; i < N; i++) board.push(null);
+    seqCounter = 0;
+    score = 0; placed = 0; cleared = 0; turn = 1; over = false;
+    var empties = [];
+    for (var i2 = 0; i2 < N; i2++) empties.push(i2);
+    for (var k = 0; k < 3; k++) {
+      var pick = empties.splice(Math.floor(Math.random() * empties.length), 1)[0];
+      board[pick] = { side: 'c', tier: 1, seq: ++seqCounter };
+    }
+    current = drawRandom();
+    held = null;
+    statusText = 'Place your ' + pieceName(current) + ' — tap an empty square.';
+    render();
+    renderScores(-1);
+  }
+  document.getElementById('holdBtn').addEventListener('click', holdSwap);
+  document.getElementById('againBtn').addEventListener('click', newGame);
+  newGame();
+</script>
+</body>
+</html>
