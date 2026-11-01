@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Space Race — Core Loop Demo</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #f4f0e5; color: #20261f; font-family: Georgia, 'Times New Roman', serif; }
+  .wrap { max-width: 520px; margin: 0 auto; padding: 12px 12px 28px; }
+  h1 { font-size: 22px; margin: 6px 0 2px; text-align: center; }
+  .sub { text-align: center; font-size: 13px; color: #6b6558; margin: 0 0 10px; }
+  .rule { height: 2px; background: #bf7d24; border: 0; margin: 8px 0 12px; }
+  .panel { background: #fffdf7; border: 1px solid #d8d0bd; border-radius: 10px; padding: 10px 12px; margin-bottom: 10px; }
+  .panel h2 { font-size: 14px; margin: 0 0 6px; letter-spacing: .04em; text-transform: uppercase; color: #6b6558; }
+  .trackrow { display: flex; align-items: center; gap: 8px; margin: 4px 0; font-size: 13px; }
+  .trackrow .who { width: 44px; font-weight: bold; }
+  .bar { flex: 1; height: 16px; background: #e8e1cf; border-radius: 8px; overflow: hidden; position: relative; }
+  .bar > i { display: block; height: 100%; background: #438b71; }
+  .bar.rival > i { background: #c84f2b; }
+  .bar > b { position: absolute; right: 4px; top: 0; line-height: 16px; font-size: 11px; color: #20261f; }
+  .stats { display: flex; gap: 12px; font-size: 13px; flex-wrap: wrap; }
+  .stats b { color: #c84f2b; }
+  .alert { background: #fbe9e4; border: 1px solid #c84f2b; color: #7a1f1f; border-radius: 10px; padding: 10px 12px; margin-bottom: 10px; font-weight: bold; text-align: center; }
+  .hazard { background: #fdf3d8; border: 1px solid #bf7d24; border-radius: 10px; padding: 10px 12px; margin-bottom: 10px; }
+  .hazard h2 { font-size: 14px; margin: 0 0 4px; color: #7a5a00; }
+  .hazard p { margin: 0 0 8px; font-size: 13px; }
+  .crewgrid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+  .crew { background: #fffdf7; border: 1px solid #d8d0bd; border-radius: 8px; padding: 6px 4px; text-align: center; font-size: 11px; }
+  .crew.busy { border-color: #bf7d24; background: #fdf3d8; }
+  .crew img { width: 44px; height: 44px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 1px 4px rgba(0,0,0,.25); object-fit: cover; }
+  .crew .nm { font-weight: bold; font-size: 11px; line-height: 1.15; min-height: 26px; }
+  .crew .rl { color: #6b6558; }
+  .crew .st { color: #bf7d24; letter-spacing: 1px; }
+  .crew .tk { margin-top: 3px; min-height: 26px; line-height: 1.2; }
+  .crew .hold { color: #438b71; font-size: 10px; }
+  .draftgrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .draftcard { background: #fffdf7; border: 1px solid #d8d0bd; border-radius: 8px; padding: 8px 6px; text-align: center; font-size: 11px; cursor: pointer; }
+  .draftcard.picked { border-color: #bf7d24; background: #fdf3d8; box-shadow: 0 0 0 2px #bf7d24; }
+  .draftcard.rival { border-color: #a03d1f; background: #f3e2dc; opacity: .55; cursor: default; }
+  .draftcard img { width: 56px; height: 56px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 1px 4px rgba(0,0,0,.25); object-fit: cover; }
+  .draftcard .nm { font-weight: bold; font-size: 12px; line-height: 1.15; }
+  .draftcard .rl { color: #6b6558; }
+  .draftcard .st { color: #bf7d24; letter-spacing: 1px; font-size: 13px; }
+  .draftcard .sk { color: #6b6558; font-size: 11px; }
+  .act { display: flex; gap: 8px; align-items: center; width: 100%; text-align: left; background: #fffdf7; border: 1px solid #d8d0bd; border-radius: 10px; padding: 8px 10px; margin-bottom: 8px; font-family: inherit; font-size: 14px; color: #20261f; cursor: pointer; }
+  .act:active { background: #f3ead2; }
+  .act img { width: 36px; height: 36px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 1px 3px rgba(0,0,0,.25); object-fit: cover; flex: none; }
+  .act .tx { flex: 1; }
+  .act .tx b { display: block; font-size: 14px; }
+  .act .tx span { font-size: 12px; color: #6b6558; }
+  .act .tn { flex: none; font-size: 12px; font-weight: bold; color: #c84f2b; white-space: nowrap; }
+  .act.special { border-color: #bf7d24; background: #fdf3d8; }
+  .sugg { display: flex; gap: 8px; align-items: center; background: #eef4ee; border: 1px solid #438b71; border-radius: 10px; padding: 8px 10px; margin-bottom: 10px; cursor: pointer; font-size: 13px; }
+  .sugg img { width: 32px; height: 32px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 1px 3px rgba(0,0,0,.25); object-fit: cover; flex: none; }
+  .sugg b { color: #438b71; }
+  .log { font-size: 12px; line-height: 1.5; max-height: 110px; overflow-y: auto; }
+  .log div { border-bottom: 1px dashed #e8e1cf; padding: 2px 0; }
+  .log div.rival { color: #a03d1f; font-weight: 700; }
+  .result { text-align: center; padding: 14px 10px; }
+  .result h2 { font-size: 20px; margin: 0 0 6px; }
+  .result p { margin: 4px 0; font-size: 14px; }
+  .btn { display: inline-block; background: #c84f2b; color: #fff; border: 0; border-radius: 8px; padding: 10px 18px; font-size: 15px; font-family: inherit; cursor: pointer; margin-top: 8px; }
+  .rules { font-size: 13px; line-height: 1.55; }
+  .rules li { margin-bottom: 4px; }
+  .foot { text-align: center; font-size: 11px; color: #6b6558; margin-top: 12px; }
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Space Race — Core Loop Demo</h1>
+  <p class="sub">20 turns. First to the finish line wins. 5 commands per turn — tasks cost 2 to 5 commands and take 1 to 4 turns.</p>
+  <hr class="rule">
+
+  <div id="draftPanel" class="panel">
+    <h2>Draft your crew</h2>
+    <p style="font-size:13px;line-height:1.5;margin:0 0 8px;">Pick 5 plushies from the pool. After each of your picks, the rival drafts one too — so the best ones go fast. Each has an overall rating (big stars) and stars for each role — P = Pilot, E = Engineer, G = Gunner, R = Recon. The range is wide: some are 5★ specialists who are 1★ at everything else, some are steady 3★ all-rounders, and one is just 2★ everywhere. You can't have them all, so pick the crew that fits how you want to race.</p>
+    <div class="draftgrid" id="draftGrid"></div>
+    <p id="draftMsg" style="margin:10px 0 0;font-size:13px;color:#a03d1f;font-weight:700;"></p>
+    <p style="margin:6px 0 0;font-size:13px;">Rival's crew: <b id="rivalCount">0 / 5</b> <span id="rivalNames" style="color:#6a5a49;"></span></p>
+    <p style="margin:10px 0 0;">Picked <b id="draftCount">0 / 5</b></p>
+    <button class="btn" id="startRaceBtn" onclick="startRace()" disabled>Start race</button>
+    <button class="btn" onclick="showDraft()" style="background:#8a7a68;margin-left:6px;">Start over</button>
+  </div>
+
+  <div id="gamePanel" style="display:none">
+  <div class="panel">
+    <div class="stats">
+      <span>Turn <b id="turnLbl">1 / 20</b></span>
+      <span>Commands <b id="cmdLbl">5 / 5</b></span>
+      <span>Your hull <b id="hullYou">10 / 10</b></span>
+      <span>Rival hull <b id="hullRival">10 / 10</b></span>
+      <span>Your speed <b id="spdYou">5</b></span>
+      <span>Rival speed <b id="spdRival">5</b></span>
+    </div>
+    <div class="trackrow"><span class="who">You</span><div class="bar"><i id="barYou" style="width:0%"></i><b id="distYou">0 / 100</b></div></div>
+    <div class="trackrow"><span class="who">Rival</span><div class="bar rival"><i id="barRival" style="width:0%"></i><b id="distRival">0 / 100</b></div></div>
+  </div>
+
+  <div id="missileBox" class="alert hidden"></div>
+
+  <div id="hazardBox" class="hazard hidden"></div>
+
+  <div class="panel">
+    <h2>Your crew — pirate ship</h2>
+    <div class="crewgrid" id="crewGrid"></div>
+    <p style="font-size:11px;color:#6b6558;margin:8px 0 0;">Flex crew members hold progress when reassigned. Everyone else scraps their task if you move them.</p>
+  </div>
+
+  <div id="suggBox" class="sugg hidden"></div>
+
+  <div class="panel">
+    <h2>What do you do? <span style="text-transform:none;letter-spacing:0;">(spend up to 5 commands — or end your turn)</span></h2>
+    <div id="actionList"></div>
+  </div>
+
+  <div class="panel">
+    <h2>Log</h2>
+    <div class="log" id="logBox"></div>
+  </div>
+
+  <div id="resultBox" class="panel result hidden"></div>
+  </div>
+
+  <div class="panel rules">
+    <h2>How it plays</h2>
+    <ul>
+      <li><b>Race:</b> 20 turns. First to distance 100 wins. If nobody finishes by turn 20, whoever is furthest wins. If a ship's hull hits 0, it's destroyed and loses. Both ships are pirate ships — base speed 5, same as each other.</li>
+      <li><b>Draft:</b> pick 5 crew from a pool of 10 before the race. The range is wide — 5★ specialists who are 1★ at everything else, steady 3★ all-rounders, and a 2★ Flex. Your crew decides how fast tasks go and how much missile warning you get.</li>
+      <li><b>Commands:</b> 5 commands per turn. A task costs 1 more command than the turns it takes (a 1-turn task costs 2 commands, a 4-turn task costs 5). The Flex's Boost is just 1 command (but it still takes 3 turns to finish). Use all 5 or just most — tap End turn to resolve. Only 6 task options show per turn (the most useful ones for the situation), plus the free one-time actions. Instant actions (power-up, sacrifice) are free. Cheer costs 1 command.</li>
+      <li><b>Crew:</b> each crew member has an overall rating (big stars), then the initials of their other roles with a star level each (e.g. Pilot · E1 · G2 · R2). Pick who does a task — each task shows a few crew members who can do it, at different costs. Tasks take fewer turns with more stars (5★ = 1 turn, 4★/3★ = 2, 2★ = 3, 1★ = 4; a Flex takes 3 everywhere). A Flex holds progress when reassigned, and their Cheer costs 1 command (+1 speed this turn, once per turn).</li>
+      <li><b>Missiles (pick the right one):</b> Dart (1 command, 1 damage — cheap, use it with your last command), Standard cannon (damage scales with gunner stars), Salvo (damage +2, shoots down a missile too), Torpedo (double damage, costs more — best on a healthy rival). Only Standard and Salvo shoot down an incoming missile.</li>
+      <li><b>The rival:</b> its ship is faster than yours (base speed 7 vs your 5), so you can't win by just shooting — you have to boost too. It only repairs when its hull is 6 or less (+2), so your damage actually sticks now.</li>
+      <li><b>Don't spam one system:</b> using the same system 4 times in a row (engines, cannons, sensors, or the repair bay) breaks it — an engineer has to fix it before you can use it again. Vary your actions.</li>
+      <li><b>Damage slows a ship:</b> when a ship's hull drops to 8, 5, or 2, its movement falls off by 1 each time (base 5, both ships). Hit the rival to slow it down.</li>
+      <li><b>Recon stars = warning.</b> A missile is incoming in your best recon's stars turns (5 with Ink Squid, 4 with Mist Unicorn, +1 after a Scan). The rival launches one every 3 turns (turns 3, 6, 9, 12, 15, 18). Shoot it down (gunner), dodge it (evasive maneuvers), jam it (recon), or focus shields to absorb it. If it hits: hull −6 and you're slowed.</li>
+      <li><b>Halfway (turn 10):</b> a random hazard — asteroid field or space pirates. Pick an approach: evade, ram through with shields, or have recon prepare in advance. Each uses a different crew member.</li>
+      <li><b>Power-up (once per race):</b> All-Out Cannon Blast — a missile barrage the rival can't fully stop. It triages and limits the damage, so it's a big hit, not a win button.</li>
+      <li><b>Sacrifice:</b> dump the cannons for +1 speed permanently — but you lose cannon fire for the rest of the race. Available from the halfway mark (turn 10).</li>
+      <li><b>Crew suggestions:</b> every few seconds a crew member suggests something. Tap it to do it, if you can afford it.</li>
+      <li><b>Log:</b> what the rival ship does shows in bold red, including how far it moved each turn — so you can see its moves at a glance.</li>
+    </ul>
+  </div>
+
+  <p class="foot">Demo only — core loop. Crew faces are plushies; lineup is a first pass and can be swapped. No XP, no boxes from this game.</p>
+</div>
+
+<script>
+'use strict';
+var FINISH = 100, MAX_TURN = 20, HULL_MAX = 10;
+
+// Spam rule: using the same ship system 4 times in a row breaks it (an engineer has to fix it).
+var SYSTEM_FOR = {
+  'fire': 'cannons', 'salvo': 'cannons', 'target-engines': 'cannons', 'hazard-fight': 'cannons', 'dart': 'cannons', 'torpedo': 'cannons',
+  'boost': 'engines', 'slipstream': 'engines', 'overclock': 'engines', 'evade-maneuver': 'engines', 'hazard-evade': 'engines', 'hazard-outrun': 'engines',
+  'scan': 'sensors', 'jam': 'sensors', 'sabotage': 'sensors', 'hazard-prep': 'sensors', 'hazard-spot': 'sensors',
+  'repair': 'repair-bay', 'patch': 'repair-bay', 'shield': 'repair-bay', 'hazard-ram': 'repair-bay'
+};
+var SYSTEM_NAMES = { 'cannons': 'the cannons', 'engines': 'the engines', 'sensors': 'the sensors', 'repair-bay': 'the repair bay' };
+function systemFor(taskKind) { return SYSTEM_FOR[taskKind] || null; }
+
+var CREW_DEFS = [
+  { id: 'pilot',    name: 'Foxfire Fox',  role: 'Pilot',  overall: 4,    img: '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',    holds: false,
+    skills: { pilot: 4, engineer: 1, gunner: 2, recon: 2 } },
+  { id: 'engineer', name: 'Pond Turtle',  role: 'Engineer',  overall: 4, img: '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', holds: false,
+    skills: { pilot: 1, engineer: 4, gunner: 1, recon: 2 } },
+  { id: 'gunner',   name: 'Ember Drake',  role: 'Gunner',  overall: 5,   img: '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',   holds: false,
+    skills: { pilot: 2, engineer: 1, gunner: 5, recon: 1 } },
+  { id: 'recon',    name: 'Mist Unicorn', role: 'Recon',  overall: 4,    img: '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',    holds: false,
+    skills: { pilot: 2, engineer: 1, gunner: 1, recon: 4 } },
+  { id: 'flex',     name: 'Cuddle Cub',   role: 'Flex',   overall: 3,     img: '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',     holds: true,
+    skills: { pilot: 3, engineer: 3, gunner: 3, recon: 3 } },
+];
+
+var DRAFT_POOL = [
+  { id: 'foxfire-fox', name: 'Foxfire Fox', role: 'Pilot', overall: 4, img: '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', holds: false,
+    skills: { pilot: 4, engineer: 1, gunner: 2, recon: 2 } },
+  { id: 'bog-frog', name: 'Bog Frog', role: 'Pilot', overall: 5, img: '/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBAUEBAYFBQUGBgYHCQ4JCQgICRINDQoOFRIWFhUSFBQXGiEcFxgfGRQUHScdHyIjJSUlFhwpLCgkKyEkJST/2wBDAQYGBgkICREJCREkGBQYJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCT/wAARCACAAIADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD6MUEDmn/lSAmlHNYmwtGOaKKQBRzQKKYBQOD1qvf30Om2kt5cNthiALt/dGcZqrp+uWmoWK36Sxi2kG5JA3DDn+WOcf0rN1Ip8reo7Gl3oqK2uYLyFZ7eVJYn+66HINS1aaauhBmiiigA70ueaCKTFAC/So249qfSEUwGg4pwORTR0waUDigB2aXPHWmilz0pAKKQijNcx4+8bw+BdNgv7mONkkl8sq77SfpU1JqEeaWwHH/FrxRf+HJ0TTpLZA4Kt57bXZiDkLuB3AcEkcLjt1ryPS9W1a7ia1ijlv4mh+ZADshYZbajA84XdwTzn3qXxLfaD4zvLnUdevbi4kuH8t1jk2hADnancfKRgfgfWotF8QaHpF3awWZuck9ZDlmBLLtA6kgHjr3xXgVv3zbimbwTkro9p+HPjTTJrRLA39vamEKvlEFs4Azlj908gY6YFelAg9MV8w3vibSLG98vUYVdYow/2yIeZtcYwWVeW4Iznkc5r1T4feLppWtYLm8imtLiP9w0bhkC44IPpnj/AArvwdRwgoz2KnSduY9LPtSY46VnWniPSdQvpLC1vEluIxkqoOPwbGD+BrSznivRTT2OdprcPejtS0hpiEpCeKWkxx0oAbSqaMccUnOMUwHDmgUgNL2oA4P4x+ItW8O+F4Z9KFyrTXKxSy26bmRT0H+yGOBntXg3ivxf4iuNVt9N12yDWdpEt1Gs9z5kMkjYC8Y5OeMDoTmvZvjJ8QNV8HxWtpp0fltebsTAZ+XByDnjHX8hXzRLDPrOY4Emu51UvLJ1A4+9zxjk45A44Brz61RObRvCSUdTon0OLSrSNo9LLXckrOZdoVI8kEkg/MQMcAcnmpdOCW0NlqCPbw3NuQ6eZbJHsx0kDMd3Ax6McVU8N+Fv7eV4pfFUdy/lMsUKSNN5bY+U7TyOevGa2Jfhxcpo6WyX0d/rjfNdBH2RmI/cPGAxGOvWuCpNJ2ciPa2LS3D3qzv5cGpMyNNHNHCqyKxAZmkUfKSCfXnGTVqOy0vVvCNzb299a2GpCDdvgUwMrgcFomJYH165BODioZ/hvNcXdo9prT2pjKJfx8SZdCDuVmHBAxgnsO9WrnRdRtrl7ax1Cz1oyu7G3xiZRg8ZGRj2ynUgdhWSqxv7r/r8ivbK/Y3fhf4V8aw2OmXIu4LlZJV+1QuwT7Mg/jVurHA6D19K9/7k184aB4hvNOvftFheS2UnnRx3Vo6EOvHJIJJyCV5I7c54NfRNiZfscPnNvkKDc2MZPrivUwVZTvG2oVne3Ynpp/OloNd5iJRS0h4oAbR1pepzSd6YBilpOM0Z55pAeUftD6Bcan4bsrm2UhYLnNzIOSkew44zzzxjvkA8V554V06TwzqkN3Kv2bRrezVpoYR50ryvgHcqjcSCevsK9s+KcTzeFHRWcK0yo5U4IByP615pp99ZR25tRbQpGq7FbH7weh3dc/jXi4+dqnKN7HGfFj4X694m1+w1jRr21jhS2WKRnk8tlIYnzBgfNkEe+Rium0jR7XRvs2nwN5k0ib3DsWabG1M5POOgx0G6rEpntluRcpLcG1AYCBC5kR/ukD17emRmrlpp/iC6SKYyaRZMh+RJd80gBxgEqQB05AJrklUnUgovZGfLd3RieM/BkvjbRludCvkttRaXfIXnZEu0xjnHAYEdcc1u+C9HvPB/hiw0y8uBPPDv842yl1Uux2jplgueTVoLq+mFI9R02C4tS237Rpis6xE9N8RAZBnuMj1xU9lK8uovDGBsQDcehZiMn9McetY1atRU1Se24+WxX1LwdfawLG8uYVk1S3uGWK5VgfNTGVV8dRkEAnkZFe0QqUhRWxuVQDj1xXI6faxMYbh0w8TExlTjqMHIHWuw5r18svytsu7tYKKBxQTXqCCkNKaKAGYwB1pO9DGm+tMB3el96bmlB4oAr6np8Gr2E1lcjMcq4yOqnsR7g14b4p8P6h4Q1GN5wgSV2MDhhh8en59K90vbyHTbKe9uGCwwRtK5PGABmvlPxtDqHxHnuNYe5kuI5JCLfymLbE54Axxg8cV5mYKm+Xm3FKVkdSNcY+dJJ+7LMF2g8iNVwM+/U/nVyy8TRAyyxug2KhUP0YFlU/lmuB0Xw1Np0Ftb69d3FlNNGZcecHJ5xjqcf/rqDUbWazDR6ZYahfhwNzLcbh68YH+6ce1eYqavypj5na9j3KHxNAwDK+HPDD9Ofrx+dZySNba1eXKRM8FyyS78jMT7cHIPY4z9Sa4Lwf8A27K7HV9FksLYEs0sl2pJxzjA59OuK2/Gvhq7bXrA6dFczWsyGVnDEqJFAwp7dMmsZR15WOT0u0ez+H9OnkiiuLlNi4DIv970PsK38e9cJ4C177PeHw/eTDz2QzQR7W4T0yeM8HOK7wHivey+UJUU4fMBBS0ZzRmu0QUhzS5ppJoAa3SmFqV2+XmofMAouMlDDntShvQ1B5gqtqd6bLTbu5TlooWcfUCk5WV2Fij4tutMvdHvtEuNUtbS4vYHt0EkoUhmXjr07V85T3l7p73diuYEtR5SbeF6Y7fjz+NdD4j36ylywl3EkpJk8sDjn6HPWvGpr3WPDeoxs0kklkXIeCTOxkyQQM88dq8OdT629rNGc30O28V6bNNpun6xdTCaNP3DKF2iMuMAgA5PK8j3z3qjpccDOcSTqy9QJW4YjI79wDU3iZ7S+0eyFhFOwgmEzxgsqnjA4BwSOv41jaXegXNwY2AkZCgTndk/dPuQeMVME3D0NoWS1O0F1Df2EsBkkiS8uRawyqxJRcnL8554OOOgFelwST2v2YRzyTQyfKNyfOcnAyRxgHHavKJNKm1DSLeIWLSyTXMCQbCymH+N3AGABwAW6kk12fjfWJ/CvhS3e2RY9SlIgibq3Oc4P6n29+a5atLmaimFZrdHf+Forf8AtZdT1F4bY2bukTNIMNuG3A/nivQYbiG4QtDKkig4JU5GfSvlzwRfagrxSXl8l4Z3ieOaM7jjJyGPQjPG3+te6+Crp3uJolOIQ7KFxjBHJ/XNduCxHsZKglo3v5mcXc7KikHSj9TXuDF7U09Kdxjmm44pgV5TjNU5Ztpq9ImapTwEg4zUspFb7aFNQ3dxFdW81vIfklQo2OuCMVXuoJVztH41jXdzJbg7sjFZSdlqWkjy2SK40eR7a+H+lW7PDK2P9bDu4f8ALB/Oud8UaLHqVuWBHK7lPrXbeKEXXtQt/sauLoADzUfYCmQcNkdvpnnFc4+gyWd1bWzXEskLhsbn44/u9Ppivn5OEZ3izmqb6GT4MjjubMQTnDpmJgeoYV00Hg+CZ3kYD5SpBUDP3gBWV4x06DwWbLVIvO8q7fyn+UtlgNwbj24z7U+H4j6cbNhHcKHZkCkqeDuHGKcqUp+/BaM2py0sz0nSNHtNNQuETcgOdvUnnPWvLvHmuL4o8XR28LqLXTx3OAZG7fkKo+KPi/tgmgsiX3ZwAh4rrdG8J6XJ4dilh/fzvF5k7ONpmcjJPJ45HB9KHB0Y801uRUd9hnhu2ht42VYyH8wiBc4+buv0AFeweCNOvVu3upXxZRwLHEvGXkPLsfcdK8u0vSl+wLfQpNPOIsGBScY4DYzznHfOTj2r1zwNr1pqWlw2tvZtaeQgUJyRx9ec/WrwLhKuuZ/8OKDOopabmlPWvoyhSecUlHelxQAhWmNGDUmSaUfSkBUe1VwcisvUPDkF+hRnkjyOqEZrez7U3HqKTinoxptHkF98F7/+2f7RsPEWwiMxiGe1BUjsSVIOR61Pq/wivtXlspG1yK1a2beRFa7hIe+dzdPYDrXq5TPakaPP1rD6nSvflEcjF4KtxDEt04umjHBZQAM9cDtVtfCunKu37LF+CCui2DOKTYK1jSjFWSC5wOv/AAq0nXYWjLNAW/iVAawLj4Kat/Zv2Cy8aXVvCMbR9kRio/u5Jzj2r10R0oXHUCplQhL4kFzzvwx8NNT0exltLjWbZg0bIk1vbFHjJ7gMxX3xjFdT4U8KweF7QwR3E1yzHJllADH16Vuhec07iphhaUHzKOog296XHFH40ucD1rcAxS0g4oJoGf/Z', holds: false,
+    skills: { pilot: 5, engineer: 1, gunner: 1, recon: 1 } },
+  { id: 'pond-turtle', name: 'Pond Turtle', role: 'Engineer', overall: 4, img: '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', holds: false,
+    skills: { pilot: 1, engineer: 4, gunner: 1, recon: 2 } },
+  { id: 'meadow-bunny', name: 'Meadow Bunny', role: 'Engineer', overall: 5, img: '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', holds: false,
+    skills: { pilot: 1, engineer: 5, gunner: 2, recon: 2 } },
+  { id: 'ember-drake', name: 'Ember Drake', role: 'Gunner', overall: 5, img: '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', holds: false,
+    skills: { pilot: 2, engineer: 1, gunner: 5, recon: 1 } },
+  { id: 'dawn-chick', name: 'Dawn Chick', role: 'Gunner', overall: 3, img: '/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBAUEBAYFBQUGBgYHCQ4JCQgICRINDQoOFRIWFhUSFBQXGiEcFxgfGRQUHScdHyIjJSUlFhwpLCgkKyEkJST/2wBDAQYGBgkICREJCREkGBQYJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCT/wAARCACAAIADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD6NxzTuabThWJsA4pexzSUZ7UgDqKSl6UDmgBKKU4Azx75rPfVVGqLZjaUEXmM34n/AA/WlKSjuVGDloi/+NFRw3UNwWWJtxXqOmKl70009UJprRhRQeTR1oEGKO9HelAyaAACkx6Up4ppzQAlL0o9KKYC0UmeaXv1pAGKO1HWgigCK4t47qCSCQEpINrYODiuFu5Rp15JbRXXnSxzYSOV8Mq5AwSPXtnrxXUarr0VmkkFqyzXowFQDcFJ7n1+lcfFpU1xcTXtwTdzgGRsjaX99vcg4x9PasakoXXMejg6U7NvReZ2uheVJamdYGhkc4feOTjtWlXK6VqslsApSRl5BUKfY/1/Suitr6G5JVNyuOqOMH/69XCUbWizHE0Jxk5PYsGkpfrR7VZyB+NGTS+9IaYAeee9BoPSkzQAUuKTtQeOc0AHejoetGO9HegAz2Fcp4n8TFZJNPtJdm0HzpQSDkDO1T2NbXiLUTpOj3N0mPMC7Y89Nx4H5dfwryeS8QSFNjsz8lg3zMSc5we/vXDi6001Tp/Ez0cBh4yvUqbI37fa48xUQtHiQBfvYyR+f+NW9O1CC4CASOW+UYPbGRWDZW8ssuUjMrg+W5j+7H3DE9+STjiumtPDEkkbsb5o3IP+pGBnHB9a4OSlB/vHdno1KqStsSpdW4kTBfJCnPcZU1bSMsyzwSMHxx09M/0ok0a5aMyQ3Ilcj7s6DHT1HT/659qrC9kglFrcxNaTOCFO7KSc4wG9cVcHSk0qMrPzM/aXWh0enXrTjyphiVRnOOGHrV4da5y2uJFYEtkqchsY59DXQo4dVcDgjNenRnJrllujysTSUXzR2Y7vSUv4UGtzmEFBpce9B4FIA6Ck4PfFFFMBaQdOlGeaO9AHGfFG8aHS7WBH2mSUt9cY/wAa8/0WKS4njXzWEkxIDYPyRjv+OcfiK7X4u28j6fYToQFSVkyOoJA7/hXOeErdptTuJNuEREgXg8nBY/zFeZjZOkpTXWx7OFkvYq3Q3xYy2V+jQ3apaRrjyFjyZDjksxPGPb8TWzYTlXAwSDyT0r5u+L+u+NPC/jO31A3d7BaI5aKK1mwhUHABBHJOMnIPUAV7hpGvFdNsZLuGWG6nhRvKK5IYgEj8Ccc14WJoypQjVbVmOnerJwS1O8hkG3HpVSbT4bwyxXEvnxSciKRRlD7Ef/r96zZNUuH0W/lsYHlvoreR4oTwXcKSo/EivG/gtpXi+4vJdYv2v7O4Eg+0tfSu/wBsJZi3yN9wgYAx6H1xW2Gh7Si6qasjKcZQqch61bl7W/n0ycl5YVDI7D/WRHoT7jpmur02UTWaMMY6DFYfiO3P2zS71OHLtA/TkMMj9R+ta2hIEsAF+7uO36dK+gwsnOKk91p/kY4mSdNPuaP40Yo79aSuo4BfSjpR05xR1oAQdKD17UUlACjmgdaAaTPFAGV4p0b+3dDubNQplxviz2Ycj8+R+NeaeHbopJd2LZilV/OB6cEYP4gjBr16WVYImlfhVGTivJ/GlrqN9fNq1hapG4bICAqWHqx9cda8vNJRVNJvU9HL27uPQ2lFvfqq3sEUxUhg8qBtv0yKzdW0O71K+S6tbjydqbcADgDnI9K5eLxVq8drG50+eaZfvBU5x3Bx3rR8IeJb7W7q5+3QS2dko2K5yrMT1ABHb/CvnKsXUj7+3qetBSpz54bnceH4TFJFcPOZA0PylvzzW7OVuFVW2g+3GTXBRTatZTRxRi0kjxs89piFkTs23GQeucdxW28ushGikEG/btVlJG4nuDWuHcaUOXp95lWpznPnbNjUGFy1paRAOyyeYQexA4H45rbtoVtoI4V6KMVm6RaNbkyuFMr/AHn6k/jWtn0r6TA1Iyh7p5GKdmoi5zR+FJk0vOMV3HIJ3pfpSHijntQACkpC1NLgf/WoAfRUZkpA+e9AGd4juPKtI48jEkgBz6Dmsa3vVdmhfZjOMY7cZz+da/iNY5NPLsSGjYFfcniuQt9okzuO/czEA8n/AOtxXzebykqqt2PUwUU4Glrdh9hR9YtGx5SfNEABn0wah06ZosSXWHdsEyN69wv6VmeKfESnSX06ErJcTfuvL2ngjBBOPcYFc9ba7/aEQKSuylsFRkbexz7jpXmrmqTtTV3+TPRpUW4+87I9LeOw1WAJPGGHZxgMh9Qai0G9W484uABE5iyxyeCVP4HFcpZTwwIk7nywD8+1z0xnnNGiXN1pF+ZJo5fs100ksRxkx7m6Eent71piKU8M4zqWQ3Qi4uMXc9Ltzn7nK1ZH3R71jabdyTQoVMe4kBtvpWzzjmvWypuTutjxsVHl0YdqUdKSlFe4cIEUUtJikMgkbBqs82KsuhIqlPAx6UmNDWuwO9M/tBR/EKqXEMgz1rLuDJGT1FQ5WNFFMv6zerLYSDd90hsetcgbWWaKaWIZVCS21ucGr1zfmNSD9CD0rNtnlUXIinBSYHy2J5XI6fnXymfVXGcWl036HtZZRUovUihtSZY5fJZc/MhZcZ9x61Hc6JHc6h5q2pt9/wDrGgcqz+57ZrS1C9k0zTbGW4IaMzbHcn7uRhce2a0bS6iZHkDLnYcE+uOK83Czk/hdjtrXhqVbTw7ayW8X2cTu28s0kzliAOMDtXQ2umwIscbtuC5C7jWVd67bWOmK8bomFzyenArA0Lxb/bd8LhHzbxMYlOfvHua1xFXl96WrdvQzp051b20SPSNPlsTN9ntmVnjbD47Vrk55rhNPgnibbZOS8r5xjkZ7V29ukiQxpI2XCjcfevZyGtKpzXja3Xp6Hl5lRUGrSv8AmScUtG0UoFfSHliYoJp1IR7UgGlRTTGD2Bp56UnpTAha2RuoqtNpUMo5Aq/x60cUWTC7RzV74Rt7kH966Z9BWIfh9PDITa6nsUnJSSLcP0IrvyuaYUArnrYSlWXLNXRvTxM6bvFnFar8O7TxDp8FnrErTxwyeaoiLRjdjAPBzxUcHwt0m3geBLrUlR12FRdv09vSu62j0pPKGPrWdPA0YRUYx0KljKsnds8+1H4QaTqNqLaS91IxhdoDXDGqmgfCBfDJZNN1PEDvvaOaLdz6gg16b5ZHaneV7UVMBQqR5ZR0Khja0HeLM7StKGnJ98PIerBcVpr1680BeKOlb0aEKMVCmrJGFSrKpLmk9R/BpM0lFamYGjtSGgnigD//2Q==', holds: false,
+    skills: { pilot: 3, engineer: 3, gunner: 3, recon: 3 } },
+  { id: 'mist-unicorn', name: 'Mist Unicorn', role: 'Recon', overall: 4, img: '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', holds: false,
+    skills: { pilot: 2, engineer: 1, gunner: 1, recon: 4 } },
+  { id: 'ink-squid', name: 'Ink Squid', role: 'Recon', overall: 5, img: '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', holds: false,
+    skills: { pilot: 1, engineer: 1, gunner: 1, recon: 5 } },
+  { id: 'cuddle-cub', name: 'Cuddle Cub', role: 'Flex', overall: 3, img: '/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBAUEBAYFBQUGBgYHCQ4JCQgICRINDQoOFRIWFhUSFBQXGiEcFxgfGRQUHScdHyIjJSUlFhwpLCgkKyEkJST/2wBDAQYGBgkICREJCREkGBQYJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCQkJCT/wAARCACAAIADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD6RPXAFBz1NKeuaTNcpvYCO9Jj3oJ5pB1pDsHSijJpCaBgaTmj6mgimITvRRz70du9AAaQil5xnFJnikIQ4pDyaXFHSgYzkUzPapCc0w9aQy7jnmg0e1IOlUIQjJ5pD1ozRikMxfEXiBNGt25HmEZyei//AF64G6+I93b3hiF3mUE5QAfUAAnnp+tWfiddT2k0roW3FWCledny5BHvx+HNeafDrwIuuXP9saortHCxyGJzLIR8ynnO0Z/HivBxFepOpL3rJHvYbD040k2rtnuGheNo9W0z7S1tIHDFQ2MJIP7y/wCe1SXPiS4XlFjThsKw61gtOkEWIggSIhFA6AADA46fSqF/dD7PKrlV/duTk9DjuB16VDxtV6XEsHTvex1P/CU3EJZWWOXaM9MZH1/P8qqaz46jjtE+zo8bMTlx8wx7H3965ye7USnY3AX5scFB0HHqeeT2FU7u4F6skLDcrAJIu7oCOAB/+rPrR9bqtOPMNYWkmpcpEnxLt5r421rqJNwhCsQ5JLbj8qjuePyxXo3hLxJ/b9oyyqFuYeHH94Zxu/Ovn+58NW+i6yr2caxWkzjBZ+InzuOBnoe3v7V6j8M982tySQxhII7X58AdSeB7f/rrXC1JRqqMXdMnF0oypOTVmj00+9IelHoaOle2eGIePxprcUuCaQjPFAy5jJpM/wD6qMkZpCMjrTJE70UYpTQO5geLPCsHiW02MypKo4LjKng8N+dcnp9kNF0qGxVkZolO5+gZupOK9JYbkYeoIrgdQxGSTgDGG9uvFeNmVNRkpJas9bL6kpJwb0Rk3EaR3f2nLmQIIwSx2ovU7V7E9z9KoyyZgf5QW8tyCRkDgk5H1/WsT4g6P4m16C2tvDV4LW688FyzmP5egII5Jz279xXYeINL0PwlpY1HxTfXKiUiPyLTjc2Ccep6E9QK4oYeU0pJ/wDAO6VaMHytf8E526volUNJtyAryMwxuOBx/T/9dQxwwee12LaNbkp5e/bgn/vnnr65I7Yq/on/AAh/jZJpPDtzexTWWwtFdDcO+0nOcjjsa5Pwl4S1Hwpda0uqamby4nufNXJICDBOST3IPbjitHh3FNt/8ElVlKSjFf8AANi4sYtSha2mICkpnacsrAg5z3PfJr2TQPD9h4esVtrBDtbDNI5y8h9Sf6dq8gh3NchSBuI2gA8f5/xr2+FNkManqqAH8q7cvh70rrY4cxk0kh5FNNObpTc/nXqHliZzmkPHNLnrzzSE5GPSgC0QRwabS9zR6UxCUE4oowM5oAUHmuL8U2jWE4mVcxO+9QBxnPIP512gFcx4xnieNbeXzFjX7zo2ChPQ1y4ukpw81sdGGr+xnzdDmNIukh8QWMrkGFZiB/s9QCfbJBJrd8aLo2q2Z07XrFrixm53mNnRXB4GV+ZW9Dx3Ge1cJqWg6nJGVsri1vY5A2FmJjLDqBlRjgck4FVJfFnjLRYlik0p71FBCNv3MVA6/Kd2OvJHauGkpwTjJHfWr0q0lOMtTV8J22meHNKtNO0jSpoLiUI16WjdNrY5Z2Ycn0UE9e3NZPizUYz4kWGNlYx26pKP9rcSAfwP61kt4o8ceI7Vm061sNMUYDeYXaZQeA2DwoP/ANesiTQNYhRJb7VI7aFvmlm8vEgckk5JJ/P1qpwnLYzhiadOV2z0bwDpB1jVVkYgwW+JX755+UfpXrYrxX4YX0Oja2iRALa3H7hrm6kw8hxnIJ7cDHr246+05rswtNQi+5yYiu60uboB9TTaVuMUnFdJziE4pvrxSng009KQy1nmjPNNzQDVCHfWg9KTdmqeq366bZyTnGRwo9TUzkoRcnsioxcmordmd4k8RJpMDxxuBIFJZifuD/GvLta8Wy6XcSTmQOSMukjdQe/+zjn5j+Rq/rd/LM7uu55HYKOT97JB5HJ/CvNddl/tHUbbR7bLSXlwsTysCcqrMWfqc8E8/Svnp4idapzXskfQ08LCnT5Gr33PRLbVtM1a3ikSSfTXuYt6wOACVKfdUdGJz1B/CjUo5zHcJHexxhYo2bJbCKB0HIyce31qzdWEckCRLHGVCEqCRwOgwD9TXNaj4Ys3EoszKHWLEaLM6AjBAzggdec/pW0Md0kjhqZUt4SLGkTSPr91bTTLI1xaTHysgnGAy9zjGDx796r6lcpfRavbCEStCBMYmQAMSC64zwRlRz05pPD3hez0zxILiONxM1nPHvYli2U5HzH9PpWsI44pJJTGoMiKS2BlsZ9yemBx+FdlKoqkbo83EUPYTUW7nl3hzxHceIrkXd38qDKxwoSBEo6gf7XHU5zjtXu/gHxk+ItM1FyVbCwSuCCDnhee3Ye9fOVlF/YnjW+0xs+S0jPGvbBOD/T869X0tZNgP3enTI3Y46c+noMcc1x1KsqVXnR7dOjCrS5LHvDetNJ9uKxPC2sNqen+XPn7Tb/JJnqR2NbBNezTmpxUl1PEnBwk4voBOMUUmaTNWSWulFGO1FMQVyPje8aMJEoztUtwMkk+3euuFc34z0y5uLb7RaRmR1H3QM4PODgdeTXHj4ylRaideBlGNZOR5J4h1dYJJ4zHJI4VlaYJlUbA+RfocMT61yPhotc+P7aeQAIsEjRc7QSWxkceikfnXSSeFNb8Qz7Wjk0+CMBJZLlSNndto/iPU56c8mtefwlHDqMeqrqKQyx28VrHDGmI0jUfKOc7mIBJORyScV4sEoxZ70ndpG+84aQAKGYKDz06gA/zP5Vm3uHCuJWL7JJY1Q5x8vJHqcHjPdqhXUvIP2eVY47k/wCuB52jGAOOpJOPQc5onu1ErgRAxbOJQ2S4GSV9gcD65rBItkFpctBqmnuLZd25R5e7DOGQK2T7Zznvg1HcXciyC3i05mCHbvkuRswGKk4UAkAR1Unu2tbe2uJii3KRKY/MwWyY8HnoDk+1c3eeK9VguDDb6dBLcSCRY41JZgZGDce68gE8da9DDVVFcrPKx2FlVkpIwfFmm3cfjDTLryVEs0jKEjUDLDhk/MfjkHvXqGkyRXFjEVIK4wSRxkjoCfrXN6P8P9futQttc1e+t4bm3mWYQTZYcHP7zHQfLg4rf1WzvdJ84W1tusZiZESHL+RuOSuMZwD0OOmM4NZ12qi0eqOrDJ01ZnTeENSeDX7ZMtsug6MCcD249cjrXpGa8x8B6ZqF/qUer3ttJbxRAECVSrFgD2PPUmvSDKT3FelgFJU/ePNx7i6mhKWApCwNRF896bmu04rGoRk5pCOaf69aaaskTOKC2AT6UU1v0pXA861q6kmlluHLSGQnbnOAOecdz7elcvczh5cjZFJvJ8xAccKQuR07Y59OK6/W4fsdxJCzfMmSM/xKScfh/hXI31vEsTRKRjBxnoM98V8tNNSfNufUU3FxVtjnPEU0s1obiEyI8DeZCpJGR0KnnnPqeoIqjo/iYX8EBM7BpFAOCCcnHHYdj9KPFF61ppVw0KrNNMf3SAnLtgDP5jOfauA8N6H4wA2wafDKCeMybcfpXVSoOpBsxqV1CSTPQNR1JYrUHagVER2bhs4UDAzwMEdK6nwLoUWm6WNWniBu7oeaz7csqE5VR+BBx6mvO5fBXj27s/Ji0uzTK7STcZ/pXrOjNfW2gWC6tbrb3UXlrOm7KnaQMg9x0P4c1NWhOEbscK0ZysiTUnVVdZQHH+rOeVUntj9M1mHVHjnS6t3KSM/mYRs7sDr7YAz/ADq1qW48ZIHf6nqazYLbzbmOCMDLHaO+B3P5GuaCd9DebVtT1SC+M8Ecpz86hufcVJ9oz3rMtHUoqK2AoCj6CtGCDf3r6KLbPnJJJkockd6kUk05LaplhPTFapGbZqDPIoIb0p56UzdxWhmMK0xlNTimtg0mhpmNrOiQ6xCIpWZGXlJExuQ+1cdqHwqnvBgeI7uMdCRbx5Iz616MBntQUrGeHpyd2jeGJqQVos80s/g3pkD+Zc3t1eSf3pMD8gBgD2FdJYeDtO09AkMQAFdKYx15o8sU1RitkKVaT3ZkppcSDATior3Q4L6AxPlQRjK9RW0Y6Ty+OlN001ZiVWSd0zz+7+G1zOuyPXplTGPnt0dvbnI6VY0X4cJpTM8mpXF1I/3pHRQT7cdB7V3OwelAUDtWccNTi7pFyxVSSs2ZEGgwQAYLH6mr8dmqdKtBaMVuopGLk2RiJU4xS4wOn509h360jA7aZJ//2Q==', holds: true,
+    skills: { pilot: 3, engineer: 3, gunner: 3, recon: 3 } },
+  { id: 'kernal-acorn', name: 'Kernal Acorn', role: 'Flex', overall: 2, img: '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', holds: true,
+    skills: { pilot: 2, engineer: 2, gunner: 2, recon: 2 } },
+];
+
+var S = null;
+
+function $(id) { return document.getElementById(id); }
+function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
+
+function effStars(crew, role) {
+  var st = crew.skills[role] || 1;
+  if (crew.role === 'Flex') st = Math.min(st, 2);
+  return st;
+}
+function taskTime(crew, role) {
+  var st = effStars(crew, role);
+  if (st >= 5) return 1;
+  if (st >= 3) return 2;
+  if (st === 2) return 3;
+  return 4;
+}
+function taskCost(crew, kind, turns) {
+  if (crew.role === 'Flex' && kind === 'boost') return 1;
+  return turns + 1;
+}
+function stars(n) { var s = ''; for (var i = 0; i < n; i++) s += '★'; return s; }
+
+var DRAFTED = null;
+var draftPicked = [];
+var draftRival = [];
+var draftMsg = '';
+function draftCardHtml(d) {
+  var picked = draftPicked.indexOf(d.id) !== -1;
+  var rivalTook = draftRival.indexOf(d.id) !== -1;
+  var others = [];
+  var roles = ['pilot', 'engineer', 'gunner', 'recon'];
+  var initials = { pilot: 'P', engineer: 'E', gunner: 'G', recon: 'R' };
+  for (var i = 0; i < roles.length; i++) {
+    var r = roles[i];
+    if (r !== d.role.toLowerCase()) others.push(initials[r] + d.skills[r]);
+  }
+  return '<div class="draftcard' + (picked ? ' picked' : '') + (rivalTook ? ' rival' : '') + '" onclick="toggleDraft(\'' + d.id + '\')">' +
+    '<img src="data:image/jpeg;base64,' + d.img + '" alt="' + esc(d.name) + '">' +
+    '<div class="nm">' + esc(d.name) + '</div>' +
+    '<div class="rl">' + esc(d.role) + '</div>' +
+    '<div class="st">' + stars(d.overall) + '</div>' +
+    '<div class="sk">' + esc(d.role) + ' · ' + others.join(' · ') + '</div>' +
+    (d.holds ? '<div style="color:#438b71;font-size:10px;">holds progress</div>' : '') +
+    (rivalTook ? '<div style="color:#a03d1f;font-size:10px;font-weight:700;">Rival took it</div>' : '') +
+    '</div>';
+}
+function renderDraft() {
+  var g = $('draftGrid');
+  var html = '';
+  for (var i = 0; i < DRAFT_POOL.length; i++) html += draftCardHtml(DRAFT_POOL[i]);
+  g.innerHTML = html;
+  $('draftCount').textContent = draftPicked.length + ' / 5';
+  $('rivalCount').textContent = draftRival.length + ' / 5';
+  var rn = [];
+  for (var j = 0; j < DRAFT_POOL.length; j++) {
+    if (draftRival.indexOf(DRAFT_POOL[j].id) !== -1) rn.push(DRAFT_POOL[j].name);
+  }
+  $('rivalNames').textContent = rn.length ? '(' + rn.join(', ') + ')' : '';
+  $('draftMsg').textContent = draftMsg;
+  $('startRaceBtn').disabled = draftPicked.length !== 5;
+}
+function toggleDraft(id) {
+  if (draftPicked.indexOf(id) !== -1 || draftRival.indexOf(id) !== -1) return;
+  if (draftPicked.length >= 5) return;
+  draftPicked.push(id);
+  // The rival drafts right after you — it takes the best overall still available.
+  if (draftRival.length < 5) {
+    var best = null;
+    for (var i = 0; i < DRAFT_POOL.length; i++) {
+      var d = DRAFT_POOL[i];
+      if (draftPicked.indexOf(d.id) !== -1 || draftRival.indexOf(d.id) !== -1) continue;
+      if (!best || d.overall > best.overall) best = d;
+    }
+    if (best) {
+      draftRival.push(best.id);
+      draftMsg = 'Rival drafted ' + best.name + ' (' + best.role + ', ' + best.overall + '★)!';
+    }
+  }
+  renderDraft();
+}
+function startRace() {
+  if (draftPicked.length !== 5) return;
+  DRAFTED = [];
+  for (var i = 0; i < DRAFT_POOL.length; i++) {
+    if (draftPicked.indexOf(DRAFT_POOL[i].id) !== -1) DRAFTED.push(DRAFT_POOL[i]);
+  }
+  $('draftPanel').classList.add('hidden');
+  $('gamePanel').style.display = '';
+  newGame();
+}
+function showDraft() {
+  DRAFTED = null;
+  draftPicked = [];
+  draftRival = [];
+  draftMsg = '';
+  S = null;
+  $('gamePanel').style.display = 'none';
+  $('draftPanel').classList.remove('hidden');
+  renderDraft();
+}
+function newGame() {
+  S = {
+    turn: 1, over: false, result: '', resultWhy: '',
+    distYou: 0, distRival: 0,
+    hullYou: HULL_MAX, hullRival: HULL_MAX,
+    baseSpeedYou: 5, baseSpeedRival: 7,
+    boostYou: 0, slowYou: 0, slowRival: 0, rivalBoost: false, rivalOverdrive: 0, rivalFalloff: 0, cmdPoints: 5, cheerUsed: false, cheer: false, youFalloff: 0,
+    shieldYou: false, weakpoint: false, scanBonus: false, evasive: false, overclock: 0, jammed: false,
+    powerUpUsed: false, rivalPowerUpUsed: false, cannonsDumped: false,
+    missile: null, hazard: null, hazardSpawned: false,
+    broken: {}, lastSystem: null, systemStreak: 0,
+    crew: (DRAFTED || CREW_DEFS).map(function (d) {
+      return { id: d.id, name: d.name, role: d.role, img: d.img, holds: d.holds, overall: d.overall,
+        skills: d.skills, task: null, held: null };
+    }),
+    log: [],
+  };
+  log('Race start — 20 turns, first to ' + FINISH + ' wins. You\'re the pirate ship: more weapons, slow, weaker hull.');
+  log('Rival ship is racing you. It acts like a second player — it boosts, repairs, and throws missiles at you.');
+  render();
+}
+
+function log(msg) {
+  S.log.unshift({ t: 'Turn ' + S.turn + ': ' + msg, r: false });
+  if (S.log.length > 40) S.log.length = 40;
+}
+function logRival(msg) {
+  S.log.unshift({ t: 'Turn ' + S.turn + ': ' + msg, r: true });
+  if (S.log.length > 40) S.log.length = 40;
+}
+
+function crewById(id) {
+  for (var i = 0; i < S.crew.length; i++) if (S.crew[i].id === id) return S.crew[i];
+  return null;
+}
+function reconStars() {
+  var best = 1;
+  for (var i = 0; i < S.crew.length; i++) {
+    var st = S.crew[i].skills.recon || 1;
+    if (st > best) best = st;
+  }
+  return best;
+}
+
+function bestIdleFor(role) {
+  var best = null, bestT = 99;
+  for (var i = 0; i < S.crew.length; i++) {
+    var c = S.crew[i];
+    if (c.task) continue;
+    var t = taskTime(c, role);
+    if (t < bestT) { bestT = t; best = c; }
+  }
+  return best ? { crew: best, turns: bestT } : null;
+}
+
+function assignTask(crew, kind, label, total, effect) {
+  if (crew.task && !crew.holds) {
+    log(crew.name + ' dropped "' + crew.task.label + '" — progress scrapped.');
+  } else if (crew.task && crew.holds) {
+    crew.held = crew.task;
+    log(crew.name + ' held "' + crew.task.label + '" — progress kept.');
+  }
+  // Flex resumes a held task of the same kind where it left off.
+  if (crew.holds && crew.held && crew.held.kind === kind) {
+    total = crew.held.turnsLeft;
+    crew.held = null;
+    log(crew.name + ' picked up where they left off (' + total + ' turn' + (total === 1 ? '' : 's') + ' left).');
+  }
+  crew.task = { kind: kind, label: label, turnsLeft: total, total: total, effect: effect, crewId: crew.id };
+}
+
+function applyTaskEffect(task) {
+  var k = task.kind;
+  if (k === 'boost') { S.boostYou = 2; log('Boost done — +2 speed this turn.'); }
+  else if (k === 'repair') { S.hullYou = Math.min(HULL_MAX, S.hullYou + 3); log('Hull repaired +3 (now ' + S.hullYou + '/' + HULL_MAX + ').'); }
+  else if (k === 'fire') {
+    if (S.missile) { S.missile = null; log('Shot down the incoming missile!'); }
+    else {
+      var who = crewById(task.crewId) || S.crew[0];
+      var dmg = Math.ceil(effStars(who, 'gunner') / 2);
+      if (S.weakpoint) { dmg *= 2; S.weakpoint = false; log('Hit the rival\'s weakpoint — double damage!'); }
+      S.hullRival = Math.max(0, S.hullRival - dmg);
+      log('Cannons hit the rival for ' + dmg + ' (rival hull ' + S.hullRival + '/' + HULL_MAX + ').');
+      checkFalloff();
+    }
+  }
+  else if (k === 'dart') {
+    var whoD = crewById(task.crewId) || S.crew[0];
+    S.hullRival = Math.max(0, S.hullRival - 1);
+    log('Dart missile hit the rival for 1 (rival hull ' + S.hullRival + '/' + HULL_MAX + ').');
+    checkFalloff();
+  }
+  else if (k === 'torpedo') {
+    var whoT = crewById(task.crewId) || S.crew[0];
+    var dmgT = Math.ceil(effStars(whoT, 'gunner') / 2) * 2;
+    if (S.weakpoint) { dmgT *= 2; S.weakpoint = false; log('Hit the rival\'s weakpoint — double damage!'); }
+    S.hullRival = Math.max(0, S.hullRival - dmgT);
+    log('Torpedo hit the rival for ' + dmgT + ' (rival hull ' + S.hullRival + '/' + HULL_MAX + ').');
+    checkFalloff();
+  }
+  else if (k === 'scan') {
+    S.weakpoint = true; S.scanBonus = true;
+    log('Scan done — found the rival\'s weakpoint (next cannon shot ×2) and +1 warning on the next missile.');
+  }
+  else if (k === 'shield') { S.shieldYou = true; log('Shields focused forward — the next hit is absorbed.'); }
+  else if (k === 'evade-maneuver') { S.evasive = true; log('Evasive maneuvers ready — the next missile will miss.'); }
+  else if (k === 'overclock') { S.overclock = 2; S.hullYou = Math.max(0, S.hullYou - 1); log('Engines overclocked — +3 speed for 2 turns (hull −1 strain, now ' + S.hullYou + '/' + HULL_MAX + ').'); checkFalloff(); }
+  else if (k === 'target-engines') { S.hullRival = Math.max(0, S.hullRival - 1); S.slowRival = Math.max(S.slowRival, 2); log('Hit the rival\'s engines — hull −1 (now ' + S.hullRival + '/' + HULL_MAX + '), slowed 2 turns.'); checkFalloff(); }
+  else if (k === 'jam') {
+    if (S.missile) { S.missile = null; log('Jammed the missile\'s lock — it veered off course!'); }
+    else { S.jammed = true; log('Rival\'s sensors jammed — it won\'t shoot a missile next time it tries.'); }
+  }
+  else if (k === 'helpout') {
+    var n = 0;
+    for (var hi = 0; hi < S.crew.length; hi++) {
+      var hc = S.crew[hi];
+      if (hc.task && hc.task.turnsLeft > 1) { hc.task.turnsLeft -= 1; n++; }
+    }
+    log('Helped out — ' + n + ' task' + (n === 1 ? '' : 's') + ' finish' + (n === 1 ? 'es' : '') + ' 1 turn sooner.');
+  }
+  else if (k === 'slipstream') { S.boostYou = 2; S.slowRival = Math.max(S.slowRival, 1); log('Slipstream — riding the rival\'s wake, +2 speed and they\'re slowed 1 turn.'); }
+  else if (k === 'patch') { S.hullYou = Math.min(HULL_MAX, S.hullYou + 5); log('Hull patched +5 (now ' + S.hullYou + '/' + HULL_MAX + ').'); }
+  else if (k === 'salvo') {
+    if (S.missile) { S.missile = null; log('Salvo shot down the incoming missile!'); }
+    var who2 = crewById(task.crewId) || S.crew[0];
+    var dmg2 = Math.ceil(effStars(who2, 'gunner') / 2) + 2;
+    if (S.weakpoint) { dmg2 *= 2; S.weakpoint = false; log('Hit the rival\'s weakpoint — double damage!'); }
+    S.hullRival = Math.max(0, S.hullRival - dmg2);
+    log('Salvo hit the rival for ' + dmg2 + ' (rival hull ' + S.hullRival + '/' + HULL_MAX + ').');
+    checkFalloff();
+  }
+  else if (k === 'sabotage') { S.hullRival = Math.max(0, S.hullRival - 1); S.slowRival = Math.max(S.slowRival, 1); log('Sabotage — rival hull −1, slowed 1 turn.'); checkFalloff(); }
+  else if (k === 'second-wind') { S.hullYou = Math.min(HULL_MAX, S.hullYou + 2); S.boostYou = 2; log('Second wind — hull +2 and +2 speed this turn.'); }
+  else if (k.indexOf('fix-') === 0) {
+    var sys = k.slice(4);
+    S.broken[sys] = false;
+    S.lastSystem = null;
+    S.systemStreak = 0;
+    log('Fixed ' + SYSTEM_NAMES[sys] + ' — back in action!');
+  }
+  else if (k === 'hazard-evade') { S.slowYou = Math.max(S.slowYou, 1); clearHazard('evaded around it — no damage, but slowed for a turn.'); }
+  else if (k === 'hazard-ram') { S.hullYou = Math.max(0, S.hullYou - 2); clearHazard('rammed straight through — hull −2, kept your speed.'); checkFalloff(); }
+  else if (k === 'hazard-prep') { clearHazard('recon plotted a safe path — no damage, no slowing.'); }
+  else if (k === 'hazard-fight') { S.hullRival = Math.max(0, S.hullRival - 2); clearHazard('gunner drove the pirates off (rival hull ' + S.hullRival + ').'); checkFalloff(); }
+  else if (k === 'hazard-outrun') { S.slowYou = Math.max(S.slowYou, 1); clearHazard('outran the pirates — no damage, but slowed for a turn.'); }
+  else if (k === 'hazard-spot') { clearHazard('recon spotted them early — slipped past, no damage, no slowing.'); }
+}
+
+function clearHazard(how) {
+  log('Hazard cleared — ' + how);
+  S.hazard = null;
+}
+
+function speedYou() {
+  var sp = S.baseSpeedYou + (S.boostYou > 0 ? 2 : 0) + (S.cheer ? 1 : 0) + (S.overclock > 0 ? 3 : 0);
+  if (S.slowYou > 0) sp -= 1;
+  if (S.hazard) sp -= 1;
+  sp -= falloffFor(S.hullYou);
+  return Math.max(0, sp);
+}
+function falloffFor(hull) {
+  if (hull <= 2) return 3;
+  if (hull <= 5) return 2;
+  if (hull <= 8) return 1;
+  return 0;
+}
+function checkFalloff() {
+  var fr = falloffFor(S.hullRival);
+  if (fr > S.rivalFalloff) {
+    S.rivalFalloff = fr;
+    log('Rival integrity at ' + S.hullRival + '/10 — its movement is falling off (speed −' + fr + ').');
+  }
+  var fy = falloffFor(S.hullYou);
+  if (fy > S.youFalloff) {
+    S.youFalloff = fy;
+    log('Your integrity at ' + S.hullYou + '/10 — your movement is falling off (speed −' + fy + ').');
+  }
+}
+function speedRival() {
+  var sp = S.baseSpeedRival + (S.rivalBoost ? 2 : 0) + (S.rivalOverdrive > 0 ? 3 : 0);
+  if (S.slowRival > 0) sp -= 1;
+  sp -= falloffFor(S.hullRival);
+  return Math.max(0, sp);
+}
+
+function launchMissile() {
+  var warn = reconStars() + (S.scanBonus ? 1 : 0);
+  S.scanBonus = false;
+  S.missile = { turnsLeft: warn };
+  logRival('Rival launched a missile! Incoming in ' + warn + ' turns — shoot it down or focus shields.');
+}
+
+function rivalAct() {
+  // Repair if hurt (so damage slows it, but it fights back and recovers), otherwise boost.
+  S.rivalBoost = false;
+  if (S.hullRival <= 6) {
+    S.hullRival = Math.min(HULL_MAX, S.hullRival + 2);
+    logRival('Rival repaired its hull (+2, now ' + S.hullRival + '/' + HULL_MAX + ').');
+  } else {
+    S.rivalBoost = true;
+    logRival('Rival boosted its engines (+2 speed this turn).');
+  }
+  // Rival power-up once: use Overdrive when it's behind and needs to catch up.
+  if (!S.rivalPowerUpUsed && S.distRival < S.distYou - 10) {
+    S.rivalPowerUpUsed = true;
+    S.rivalOverdrive = 3;
+    logRival('Rival used Overdrive! +3 speed for 3 turns.');
+  }
+  // Missile schedule — every 3 turns. A jam blocks the next attempt (and is used up).
+  if (S.turn === 3 || S.turn === 6 || S.turn === 9 || S.turn === 12 || S.turn === 15 || S.turn === 18) {
+    if (!S.missile) {
+      if (S.jammed) { S.jammed = false; logRival('Rival tried to launch a missile, but its sensors are jammed — no missile!'); }
+      else launchMissile();
+    }
+  }
+}
+
+function resolveTurn() {
+  // 1. Crew tasks progress.
+  for (var i = 0; i < S.crew.length; i++) {
+    var c = S.crew[i];
+    if (!c.task) continue;
+    c.task.turnsLeft -= 1;
+    if (c.task.turnsLeft <= 0) {
+      var t = c.task;
+      c.task = null;
+      log(c.name + ' finished: ' + t.label + '.');
+      applyTaskEffect(t);
+      if (S.over) return;
+    }
+  }
+  // 2. Missile countdown.
+  if (S.missile) {
+    S.missile.turnsLeft -= 1;
+    if (S.missile.turnsLeft <= 0) {
+      S.missile = null;
+      if (S.evasive) {
+        S.evasive = false;
+        log('Evasive maneuvers — the missile missed!');
+      } else if (S.shieldYou) {
+        S.shieldYou = false;
+        logRival('Missile hit the shields — absorbed, no damage.');
+      } else {
+        S.hullYou = Math.max(0, S.hullYou - 6);
+        S.slowYou = Math.max(S.slowYou, 2);
+        logRival('Missile hit! Hull −6 (now ' + S.hullYou + '/' + HULL_MAX + '), slowed for 2 turns.');
+        checkFalloff();
+      }
+    }
+  }
+  // 3. Rival acts.
+  rivalAct();
+  // 4. Ships move.
+  var sy = speedYou(), sr = speedRival();
+  S.distYou += sy; S.distRival += sr;
+  logRival('Rival moved ' + sr + ' — now at ' + Math.floor(S.distRival) + ' / ' + FINISH + '.');
+  if (S.boostYou > 0) S.boostYou = 0;
+  if (S.slowYou > 0) S.slowYou -= 1;
+  if (S.slowRival > 0) S.slowRival -= 1;
+  if (S.overclock > 0) S.overclock -= 1;
+  if (S.rivalOverdrive > 0) S.rivalOverdrive -= 1;
+  // 5. Halfway hazard.
+  if (S.turn === 10 && !S.hazardSpawned) {
+    S.hazardSpawned = true;
+    S.hazard = Math.random() < 0.5 ? 'asteroids' : 'pirates';
+    if (S.hazard === 'asteroids') log('HALFWAY HAZARD — asteroid field! It slows you until you deal with it. Pick an approach below.');
+    else log('HALFWAY HAZARD — space pirates! They slow you until you deal with them. Pick an approach below.');
+  }
+  // 6. Next turn / end.
+  S.turn += 1;
+  S.cmdPoints = 5;
+  S.cheerUsed = false;
+  S.cheer = false;
+  checkEnd();
+}
+
+function checkEnd() {
+  if (S.over) return;
+  var youDone = S.distYou >= FINISH, rivDone = S.distRival >= FINISH;
+  if (S.hullYou <= 0) return endGame(false, 'Your ship was destroyed.');
+  if (S.hullRival <= 0) return endGame(true, 'You destroyed the rival ship!');
+  if (youDone && rivDone) {
+    if (S.distYou > S.distRival) return endGame(true, 'You crossed the finish line first (further ahead).');
+    if (S.distRival > S.distYou) return endGame(false, 'The rival crossed the finish line first (further ahead).');
+    return endGame(false, 'Dead heat at the finish line — the rival takes it on a tie.');
+  }
+  if (youDone) return endGame(true, 'You crossed the finish line first!');
+  if (rivDone) return endGame(false, 'The rival crossed the finish line first.');
+  if (S.turn > MAX_TURN) {
+    if (S.distYou > S.distRival) return endGame(true, 'Time! 20 turns up — you were furthest ahead.');
+    if (S.distRival > S.distYou) return endGame(false, 'Time! 20 turns up — the rival was furthest ahead.');
+    return endGame(false, 'Time! 20 turns up — dead heat, the rival takes it on a tie.');
+  }
+}
+
+function endGame(won, why) {
+  S.over = true;
+  S.result = won ? 'You win!' : 'Rival wins.';
+  S.resultWhy = why;
+  log((won ? 'YOU WIN — ' : 'RIVAL WINS — ') + why);
+  var best = null;
+  try { best = JSON.parse(localStorage.getItem('spaceRaceBest') || 'null'); } catch (e) { best = null; }
+  if (won) {
+    var turns = S.turn - 1;
+    if (!best || turns < best.turns) {
+      best = { turns: turns, dist: S.distYou };
+      try { localStorage.setItem('spaceRaceBest', JSON.stringify(best)); } catch (e) {}
+      log('New local best — finished in ' + turns + ' turns!');
+    }
+  }
+  S.best = best;
+}
+
+function crewOptionsFor(role, n) {
+  var list = [];
+  for (var i = 0; i < S.crew.length; i++) {
+    var c = S.crew[i];
+    if (c.task) continue;
+    list.push({ crew: c, turns: taskTime(c, role) });
+  }
+  list.sort(function (a, b) { return a.turns - b.turns; });
+  var out = list.slice(0, 2);
+  var flex = null;
+  for (var j = 0; j < list.length; j++) { if (list[j].crew.role === 'Flex') flex = list[j]; }
+  if (flex && out.indexOf(flex) === -1 && list.length > 2) out.push(flex);
+  return out.slice(0, n || 3);
+}
+function taskAction(kind, label, desc, role) {
+  var opts = crewOptionsFor(role, 3);
+  if (!opts.length) return null;
+  var best = opts[0];
+  return { kind: 'task', taskKind: kind, label: label, desc: desc, crew: best.crew, turns: best.turns, cost: taskCost(best.crew, kind, best.turns), options: opts };
+}
+function missileSoon() {
+  if (S.missile) return true;
+  var turns = [3, 6, 9, 12, 15, 18];
+  for (var i = 0; i < turns.length; i++) {
+    if (turns[i] >= S.turn && turns[i] - S.turn <= 1) return true;
+  }
+  return false;
+}
+function actionsForTurn() {
+  var acts = [];
+  if (S.hazard) {
+    if (S.hazard === 'asteroids') {
+      acts.push(taskAction('hazard-evade', 'Evade the asteroids', 'No damage, slowed 1 turn.', 'pilot'));
+      acts.push(taskAction('hazard-ram', 'Ram through with shields up', 'Hull −2, keep your speed.', 'engineer'));
+      acts.push(taskAction('hazard-prep', 'Recon prepares a safe path', 'No damage, no slowing.', 'recon'));
+    } else {
+      acts.push(taskAction('hazard-fight', 'Fight the pirates off', 'Gunner drives them off.', 'gunner'));
+      acts.push(taskAction('hazard-outrun', 'Outrun the pirates', 'No damage, slowed 1 turn.', 'pilot'));
+      acts.push(taskAction('hazard-spot', 'Recon spots them early', 'No damage, no slowing.', 'recon'));
+    }
+    acts.push(taskAction('boost', 'Boost speed', '+2 speed this turn.', 'pilot'));
+    acts.push(taskAction('scan', 'Scan', 'Find the rival\'s weakpoint (next cannon ×2).', 'recon'));
+  } else {
+    var f = taskAction('fire', S.missile ? 'Fire cannons — shoot down the missile' : 'Fire cannons at the rival',
+      S.missile ? 'Destroy the incoming missile.' : 'Damage scales with gunner stars' + (S.weakpoint ? ' ×2 (weakpoint!)' : '') + '.', 'gunner');
+    if (f && !S.cannonsDumped) {
+      var fdmg = Math.ceil(effStars(f.crew, 'gunner') / 2);
+      f.desc = S.missile ? 'Destroy the incoming missile.' : fdmg + ' damage' + (S.weakpoint ? ' ×2 (weakpoint!)' : '') + '.';
+      acts.push(f);
+    }
+    if (!S.cannonsDumped && (S.missile || S.hullRival <= 6)) {
+      var sv = taskAction('salvo', 'Fire a salvo', 'Bigger hit (damage +2). Shoots down a missile too, if one\'s incoming.', 'gunner');
+      if (sv) { sv.cost = sv.turns + 2; acts.push(sv); }
+    }
+    if (!S.cannonsDumped && S.hullRival >= 7) {
+      var tp = taskAction('torpedo', 'Fire a torpedo', 'Double damage.', 'gunner');
+      if (tp) { tp.cost = tp.turns + 3; acts.push(tp); }
+    }
+    if (S.missile) acts.push(taskAction('evade-maneuver', 'Evasive maneuvers', 'Dodge the next missile.', 'pilot'));
+    if (S.missile && !S.shieldYou) acts.push(taskAction('shield', 'Focus shields forward', 'Absorb the next hit.', 'engineer'));
+    if (missileSoon()) acts.push(taskAction('jam', 'Jam the rival\'s sensors', 'The rival won\'t shoot a missile next time it tries (or the incoming missile loses its lock).', 'recon'));
+    acts.push(taskAction('boost', 'Boost speed', '+2 speed this turn.', 'pilot'));
+    if (S.distRival > S.distYou) acts.push(taskAction('slipstream', 'Slipstream', 'Ride the rival\'s wake — +2 speed and slow them 1 turn.', 'pilot'));
+    if (S.distRival > S.distYou + 5) acts.push(taskAction('sabotage', 'Sabotage', 'Rival hull −1, slowed 1 turn.', 'recon'));
+    if (S.crew.some(function (c) { return c.task && c.task.turnsLeft > 1; })) acts.push(taskAction('helpout', 'Help out', 'All tasks finish 1 turn sooner.', 'flex'));
+    if (S.hullYou <= 7) acts.push(taskAction('second-wind', 'Second wind', 'Hull +2 and +2 speed this turn.', 'flex'));
+    if (S.hullYou <= 5) {
+      var pa = taskAction('patch', 'Patch hull', 'Restore 5 hull (a big repair).', 'engineer');
+      if (pa) { pa.cost = pa.turns + 2; acts.push(pa); }
+    }
+    if (S.hullYou <= 7 && S.hullYou > 5) acts.push(taskAction('repair', 'Repair hull', 'Restore 3 hull.', 'engineer'));
+    if (S.cmdPoints <= 2 && !S.cannonsDumped) {
+      var dt = taskAction('dart', 'Fire a dart missile', 'Cheap shot — 1 damage.', 'gunner');
+      if (dt) { dt.cost = 1; acts.push(dt); }
+    }
+    acts.push(taskAction('scan', 'Scan', 'Find the rival\'s weakpoint (next cannon ×2) +1 warning.', 'recon'));
+    if (!S.cannonsDumped) acts.push(taskAction('target-engines', 'Target the engines', 'Rival hull −1, slowed 2 turns.', 'gunner'));
+    if (S.hullYou > 1) acts.push(taskAction('overclock', 'Overclock engines', '+3 speed for 2 turns, hull −1 strain.', 'engineer'));
+  }
+  if (!S.powerUpUsed) acts.push({ kind: 'powerup', label: 'POWER-UP: All-Out Cannon Blast', desc: 'Once per race. Missile barrage — rival takes 5 and is slowed 3 turns.', special: true, cost: 0 });
+  if (!S.cannonsDumped && S.turn >= 10) acts.push({ kind: 'sacrifice', label: 'Dump the cannons for speed', desc: 'Permanent: +1 speed forever, lose cannon fire for the rest of the race.', special: true, cost: 0 });
+  var flexCrew = null;
+  for (var fi = 0; fi < S.crew.length; fi++) { if (S.crew[fi].role === 'Flex') { flexCrew = S.crew[fi]; break; } }
+  if (!S.cheerUsed && flexCrew) acts.push({ kind: 'cheer', label: flexCrew.name + ' cheers the crew', desc: '+1 speed this turn. Once per turn. Costs 1 command.', special: true, cost: 1 });
+  acts = acts.filter(function (a) { return a && (a.cost || 0) <= S.cmdPoints; });
+  // A broken system can't be used — filter those tasks out, and offer a fix first.
+  acts = acts.filter(function (a) { return !(a.kind === 'task' && S.broken[systemFor(a.taskKind)]); });
+  for (var sys in S.broken) {
+    if (S.broken[sys]) {
+      var fix = taskAction('fix-' + sys, 'Fix ' + SYSTEM_NAMES[sys], 'Repair ' + SYSTEM_NAMES[sys] + ' so you can use it again.', 'engineer');
+      if (fix && fix.cost <= S.cmdPoints) acts.unshift(fix);
+    }
+  }
+  var tasks = [], specials = [];
+  for (var i = 0; i < acts.length; i++) {
+    if (acts[i].kind === 'task') tasks.push(acts[i]);
+    else specials.push(acts[i]);
+  }
+  var out = tasks.slice(0, 6).concat(specials);
+  out.push({ kind: 'endturn', label: 'End turn', desc: 'Resolve the turn — crew keeps working, threats tick down, ships move.', cost: 0 });
+  return out;
+}
+
+function issue(action) {
+  if (S.over) return;
+  var cost = action.cost || 0;
+  if (cost > S.cmdPoints) return;
+  if (action.kind === 'endturn') {
+    log('End of turn — used ' + (5 - S.cmdPoints) + ' of 5 commands.');
+    resolveTurn();
+    render();
+    return;
+  }
+  S.cmdPoints -= cost;
+  if (action.kind === 'task') {
+    var label = action.label + ' — ' + action.crew.name;
+    assignTask(action.crew, action.taskKind, label, action.turns, null);
+    log('Spent ' + cost + ' command' + (cost === 1 ? '' : 's') + ': ' + action.crew.name + ' — ' + action.label + ' (' + action.turns + ' turn' + (action.turns === 1 ? '' : 's') + ').');
+    var sys = systemFor(action.taskKind);
+    if (sys) {
+      if (S.lastSystem === sys) S.systemStreak += 1; else { S.lastSystem = sys; S.systemStreak = 1; }
+      if (S.systemStreak >= 4) {
+        S.broken[sys] = true;
+        S.lastSystem = null;
+        S.systemStreak = 0;
+        log('Overuse! ' + SYSTEM_NAMES[sys] + ' broke down — an engineer has to fix it before you can use it again.');
+      }
+    }
+  } else if (action.kind === 'powerup') {
+    S.powerUpUsed = true;
+    S.hullRival = Math.max(0, S.hullRival - 5);
+    S.slowRival = Math.max(S.slowRival, 3);
+    log('POWER-UP — All-Out Cannon Blast! The rival triaged and limited it, but still took 5 damage and is slowed 3 turns (rival hull ' + S.hullRival + ').');
+    checkFalloff();
+  } else if (action.kind === 'sacrifice') {
+    S.cannonsDumped = true;
+    S.baseSpeedYou += 1;
+    log('Dumped the cannons — +1 speed permanently (now ' + S.baseSpeedYou + '), but no more cannon fire this race.');
+  } else if (action.kind === 'cheer') {
+    S.cheer = true;
+    S.cheerUsed = true;
+    var flexName = 'Your Flex';
+    for (var ci = 0; ci < S.crew.length; ci++) { if (S.crew[ci].role === 'Flex') { flexName = S.crew[ci].name; break; } }
+    log(flexName + ' cheered the crew — +1 speed this turn!');
+  }
+  render();
+  if (S.cmdPoints <= 0) {
+    log('Out of commands — turn ends.');
+    resolveTurn();
+    render();
+  }
+}
+
+function suggestion() {
+  if (S.over) return null;
+  var cands = [];
+  var m = S.missile;
+  if (m) {
+    var g = bestIdleFor('gunner');
+    if (g && !S.cannonsDumped) cands.push({ crew: g.crew, turns: g.turns, cost: g.turns + 1, kind: 'task', taskKind: 'fire', label: 'Fire cannons — shoot down the missile', text: 'I can shoot down that missile (' + (g.turns + 1) + ' commands, ' + g.turns + ' turn' + (g.turns === 1 ? '' : 's') + ').' });
+    var e2 = bestIdleFor('engineer');
+    if (e2 && !S.shieldYou) cands.push({ crew: e2.crew, turns: e2.turns, cost: e2.turns + 1, kind: 'task', taskKind: 'shield', label: 'Focus shields forward', text: 'I can focus the shields to absorb it (' + (e2.turns + 1) + ' commands, ' + e2.turns + ' turn' + (e2.turns === 1 ? '' : 's') + ').' });
+    var pv = bestIdleFor('pilot');
+    if (pv) cands.push({ crew: pv.crew, turns: pv.turns, cost: pv.turns + 1, kind: 'task', taskKind: 'evade-maneuver', label: 'Evasive maneuvers', text: 'I can dodge that missile (' + (pv.turns + 1) + ' commands, ' + pv.turns + ' turn' + (pv.turns === 1 ? '' : 's') + ').' });
+  }
+  if (S.hazard) {
+    var h = null;
+    var ha = actionsForTurn();
+    for (var hi = 0; hi < ha.length; hi++) {
+      if (ha[hi].taskKind && ha[hi].taskKind.indexOf('hazard') === 0) { h = ha[hi]; break; }
+    }
+    if (h) cands.push({ crew: h.crew, turns: h.turns, cost: h.cost, kind: 'task', taskKind: h.taskKind, label: h.label, text: 'I can handle this hazard (' + h.cost + ' commands, ' + h.turns + ' turn' + (h.turns === 1 ? '' : 's') + ').' });
+  }
+  if (S.hullYou <= 4) {
+    var e = bestIdleFor('engineer');
+    if (e) cands.push({ crew: e.crew, turns: e.turns, cost: e.turns + 1, kind: 'task', taskKind: 'repair', label: 'Repair hull', text: 'Hull\'s low — I can repair it (' + (e.turns + 1) + ' commands, ' + e.turns + ' turn' + (e.turns === 1 ? '' : 's') + ').' });
+  }
+  if (S.hullYou <= 5) {
+    var pe = bestIdleFor('engineer');
+    if (pe) cands.push({ crew: pe.crew, turns: pe.turns, cost: pe.turns + 2, kind: 'task', taskKind: 'patch', label: 'Patch hull', text: 'Hull\'s bad — I can patch it for +5 (' + (pe.turns + 2) + ' commands, ' + pe.turns + ' turn' + (pe.turns === 1 ? '' : 's') + ').' });
+  }
+  if (S.distRival > S.distYou + 8) {
+    var p = bestIdleFor('pilot');
+    if (p) {
+      var bc = taskCost(p.crew, 'boost', p.turns);
+      cands.push({ crew: p.crew, turns: p.turns, cost: bc, kind: 'task', taskKind: 'boost', label: 'Boost speed', text: 'They\'re pulling ahead — I can boost our speed (' + bc + ' command' + (bc === 1 ? '' : 's') + ', ' + p.turns + ' turn' + (p.turns === 1 ? '' : 's') + ').' });
+    }
+    var sl = bestIdleFor('pilot');
+    if (sl) cands.push({ crew: sl.crew, turns: sl.turns, cost: sl.turns + 1, kind: 'task', taskKind: 'slipstream', label: 'Slipstream', text: 'I can ride their wake and slow them down (' + (sl.turns + 1) + ' commands, ' + sl.turns + ' turn' + (sl.turns === 1 ? '' : 's') + ').' });
+    var tg = bestIdleFor('gunner');
+    if (tg && !S.cannonsDumped) cands.push({ crew: tg.crew, turns: tg.turns, cost: tg.turns + 1, kind: 'task', taskKind: 'target-engines', label: 'Target the engines', text: 'I can hit their engines and slow them down (' + (tg.turns + 1) + ' commands, ' + tg.turns + ' turn' + (tg.turns === 1 ? '' : 's') + ').' });
+    var sb = bestIdleFor('recon');
+    if (sb) cands.push({ crew: sb.crew, turns: sb.turns, cost: sb.turns + 1, kind: 'task', taskKind: 'sabotage', label: 'Sabotage', text: 'I can sabotage their ship — hull −1, slowed 1 turn (' + (sb.turns + 1) + ' commands, ' + sb.turns + ' turn' + (sb.turns === 1 ? '' : 's') + ').' });
+  }
+  if (!S.weakpoint) {
+    var r = bestIdleFor('recon');
+    if (r) cands.push({ crew: r.crew, turns: r.turns, cost: r.turns + 1, kind: 'task', taskKind: 'scan', label: 'Scan', text: 'I can scan for the rival\'s weakpoint (' + (r.turns + 1) + ' commands, ' + r.turns + ' turn' + (r.turns === 1 ? '' : 's') + ').' });
+  }
+  var pg = bestIdleFor('gunner');
+  if (!S.powerUpUsed) cands.push({ crew: pg ? pg.crew : S.crew[0], turns: 1, cost: 0, kind: 'powerup', label: 'POWER-UP: All-Out Cannon Blast', text: 'We could fire the All-Out Cannon Blast — once per race.' });
+  var f = bestIdleFor('gunner');
+  if (f && !S.cannonsDumped && (S.missile || S.hullRival <= 6)) cands.push({ crew: f.crew, turns: f.turns, cost: f.turns + 2, kind: 'task', taskKind: 'salvo', label: 'Fire a salvo', text: 'I can fire a salvo — bigger hit, and it takes down a missile too (' + (f.turns + 2) + ' commands, ' + f.turns + ' turn' + (f.turns === 1 ? '' : 's') + ').' });
+  if (f && !S.cannonsDumped && S.hullRival >= 7) cands.push({ crew: f.crew, turns: f.turns, cost: f.turns + 3, kind: 'task', taskKind: 'torpedo', label: 'Fire a torpedo', text: 'I can fire a torpedo — double damage (' + (f.turns + 3) + ' commands, ' + f.turns + ' turn' + (f.turns === 1 ? '' : 's') + ').' });
+  if (f && !S.cannonsDumped && S.cmdPoints <= 2) cands.push({ crew: f.crew, turns: f.turns, cost: 1, kind: 'task', taskKind: 'dart', label: 'Fire a dart missile', text: 'I can fire a dart — cheap, 1 damage (1 command, ' + f.turns + ' turn' + (f.turns === 1 ? '' : 's') + ').' });
+  if (f && !S.cannonsDumped) cands.push({ crew: f.crew, turns: f.turns, cost: f.turns + 1, kind: 'task', taskKind: 'fire', label: 'Fire cannons at the rival', text: 'I can hit the rival (' + (f.turns + 1) + ' commands, ' + f.turns + ' turn' + (f.turns === 1 ? '' : 's') + ').' });
+  for (var i = 0; i < cands.length; i++) {
+    if ((cands[i].cost || 0) <= S.cmdPoints) return cands[i];
+  }
+  return null;
+}
+
+function render() {
+  $('turnLbl').textContent = Math.min(S.turn, MAX_TURN) + ' / ' + MAX_TURN;
+  $('cmdLbl').textContent = S.cmdPoints + ' / 5';
+  $('hullYou').textContent = S.hullYou + ' / ' + HULL_MAX + (S.shieldYou ? ' + shield' : '');
+  $('hullRival').textContent = S.hullRival + ' / ' + HULL_MAX;
+  $('spdYou').textContent = speedYou();
+  $('spdRival').textContent = speedRival();
+  $('barYou').style.width = Math.min(100, S.distYou) + '%';
+  $('barRival').style.width = Math.min(100, S.distRival) + '%';
+  $('distYou').textContent = Math.floor(S.distYou) + ' / ' + FINISH;
+  $('distRival').textContent = Math.floor(S.distRival) + ' / ' + FINISH;
+
+  var mb = $('missileBox');
+  if (S.missile && !S.over) {
+    mb.classList.remove('hidden');
+    mb.textContent = 'MISSILE INCOMING — ' + S.missile.turnsLeft + ' turn' + (S.missile.turnsLeft === 1 ? '' : 's') + '! Shoot it down or focus shields.';
+  } else mb.classList.add('hidden');
+
+  var hz = $('hazardBox');
+  if (S.hazard && !S.over) {
+    hz.classList.remove('hidden');
+    hz.innerHTML = '<h2>' + (S.hazard === 'asteroids' ? 'ASTEROID FIELD' : 'SPACE PIRATES') + ' — halfway hazard</h2>' +
+      '<p>It slows you (speed −1) until you deal with it. Pick an approach below — each uses a different crew member.</p>';
+  } else hz.classList.add('hidden');
+
+  var cg = $('crewGrid');
+  cg.innerHTML = S.crew.map(function (c) {
+    var tk = c.task ? esc(c.task.label) + ' — ' + c.task.turnsLeft + '/' + c.task.total : 'Idle';
+    var ROLES = ['pilot', 'engineer', 'gunner', 'recon'];
+    var INITS = { pilot: 'P', engineer: 'E', gunner: 'G', recon: 'R' };
+    var others = [];
+    for (var ri = 0; ri < ROLES.length; ri++) {
+      var rr = ROLES[ri];
+      if (rr === c.role.toLowerCase()) continue;
+      others.push(INITS[rr] + (c.skills[rr] || 1));
+    }
+    var rb = others.join(' · ');
+    return '<div class="crew' + (c.task ? ' busy' : '') + '">' +
+      '<img src="data:image/jpeg;base64,' + c.img + '" alt="' + esc(c.name) + '">' +
+      '<div class="nm">' + esc(c.name) + '</div>' +
+      '<div class="st">' + stars(c.overall) + '</div>' +
+      '<div class="rl">' + esc(c.role) + ' · ' + rb + '</div>' +
+      '<div class="tk">' + tk + '</div>' +
+      (c.holds ? '<div class="hold">Holds progress</div>' : '') +
+      '</div>';
+  }).join('');
+
+  var sb = $('suggBox');
+  var sg = suggestion();
+  if (sg && !S.over) {
+    sb.classList.remove('hidden');
+    sb.innerHTML = '<img src="data:image/jpeg;base64,' + sg.crew.img + '" alt="' + esc(sg.crew.name) + '">' +
+      '<span><b>' + esc(sg.crew.name) + ':</b> ' + esc(sg.text) + '</span>';
+    sb.onclick = function () { issue(sg); };
+  } else sb.classList.add('hidden');
+
+  var al = $('actionList');
+  if (S.over) { al.innerHTML = ''; }
+  else {
+    al.innerHTML = '';
+    actionsForTurn().forEach(function (a) {
+      var wrap = document.createElement('div');
+      wrap.style.marginBottom = '8px';
+      var b = document.createElement('button');
+      b.className = 'act' + (a.special ? ' special' : '');
+      b.style.marginBottom = '0';
+      var img = a.crew ? '<img src="data:image/jpeg;base64,' + a.crew.img + '" alt="">' : '';
+      var costTxt = (a.cost || 0) === 0 ? 'Free' : a.cost + ' command' + (a.cost === 1 ? '' : 's') + (a.taskKind ? ' · ' + a.turns + ' turn' + (a.turns === 1 ? '' : 's') : '');
+      b.innerHTML = img + '<span class="tx"><b>' + esc(a.label) + '</b><span>' + esc(a.desc) + '</span></span>' +
+        '<span class="tn">' + costTxt + '</span>';
+      b.onclick = function () { issue(a); };
+      wrap.appendChild(b);
+      if (a.options && a.options.length > 1) {
+        var altRow = document.createElement('div');
+        altRow.style.cssText = 'display:flex;gap:6px;margin-top:4px;flex-wrap:wrap;';
+        a.options.slice(1).forEach(function (opt) {
+          var ab = document.createElement('button');
+          ab.style.cssText = 'flex:1;padding:5px 6px;font-size:12px;font-family:inherit;background:#f4f0e5;border:1px solid #d8d0bd;border-radius:8px;color:#20261f;cursor:pointer;';
+          var oc = taskCost(opt.crew, a.taskKind, opt.turns);
+          ab.textContent = opt.crew.name + ' · ' + oc + ' command' + (oc === 1 ? '' : 's') + ' · ' + opt.turns + ' turn' + (opt.turns === 1 ? '' : 's');
+          ab.onclick = function () {
+            var copy = {};
+            for (var k in a) copy[k] = a[k];
+            copy.crew = opt.crew; copy.turns = opt.turns; copy.cost = taskCost(opt.crew, a.taskKind, opt.turns);
+            issue(copy);
+          };
+          altRow.appendChild(ab);
+        });
+        wrap.appendChild(altRow);
+      }
+      al.appendChild(wrap);
+    });
+  }
+
+  $('logBox').innerHTML = S.log.map(function (l) { return '<div' + (l.r ? ' class="rival"' : '') + '>' + esc(l.t) + '</div>'; }).join('');
+
+  var rb = $('resultBox');
+  if (S.over) {
+    rb.classList.remove('hidden');
+    var bestTxt = '';
+    if (S.best) bestTxt = '<p>Local best: finished in ' + S.best.turns + ' turns.</p>';
+    rb.innerHTML = '<h2>' + esc(S.result) + '</h2><p>' + esc(S.resultWhy) + '</p>' +
+      '<p>Turns: ' + (S.turn - 1) + ' / ' + MAX_TURN + ' · You: ' + Math.floor(S.distYou) + ' · Rival: ' + Math.floor(S.distRival) + '</p>' +
+      bestTxt + '<button class="btn" onclick="showDraft()">Draft a new crew</button>';
+  } else rb.classList.add('hidden');
+}
+
+renderDraft();
+setInterval(function () {
+  if (S && !S.over) render();
+}, 3000);
+</script>
+</body>
+</html>
