@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Monster Master — Card Battle</title>
+<style>
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body { margin: 0; background: #f4f0e5; color: #20261f; font-family: Georgia, 'Times New Roman', serif; }
+  .wrap { max-width: 600px; margin: 0 auto; padding: 10px 10px 24px; }
+  h1 { text-align: center; margin: 6px 0 0; font-size: 28px; letter-spacing: 1px; }
+  .sub { text-align: center; color: #6b6f66; font-size: 13px; margin: 2px 0 10px; font-style: italic; }
+  .panel { background: #fffdf7; border: 1px solid #d8d2c2; border-radius: 12px; padding: 10px; margin-bottom: 10px; }
+  .row { display: flex; align-items: center; gap: 8px; }
+  .who { font-weight: bold; font-size: 16px; }
+  .hpbar { flex: 1; height: 18px; background: #e7e1d2; border-radius: 9px; overflow: hidden; border: 1px solid #c9c2b0; }
+  .hpfill { height: 100%; background: #438b71; transition: width .3s; }
+  .hpfill.low { background: #c84f2b; }
+  .hpnum { font-weight: bold; min-width: 52px; text-align: right; font-size: 14px; }
+  .avatar { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 20px; color: #fffdf7; border: 2px solid #20261f; flex: none; cursor: default; user-select: none; }
+  .avatar.you { background: #438b71; }
+  .avatar.rival { background: #7a1f1f; }
+  .avatar.targetable { cursor: pointer; outline: 3px solid #c84f2b; outline-offset: 2px; animation: pulse 1s infinite; }
+  @keyframes pulse { 0%,100% { outline-color: #c84f2b; } 50% { outline-color: #e8a33d; } }
+  .label { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #6b6f66; margin: 8px 0 4px; }
+  .field { display: flex; flex-wrap: wrap; gap: 6px; min-height: 96px; align-content: flex-start; background: #f4f0e5; border: 1px dashed #c9c2b0; border-radius: 10px; padding: 6px; }
+  .field.empty::after { content: "No monsters yet"; color: #9a968a; font-style: italic; font-size: 13px; padding: 6px; }
+  .hand { display: flex; gap: 6px; overflow-x: auto; padding: 6px 2px 8px; min-height: 118px; }
+  .hand::-webkit-scrollbar { height: 6px; }
+  .hand::-webkit-scrollbar-thumb { background: #c9c2b0; border-radius: 3px; }
+  .card { flex: none; width: 88px; background: #fffdf7; border: 2px solid #788879; border-radius: 10px; padding: 6px 6px 5px; text-align: center; cursor: pointer; user-select: none; position: relative; }
+  .card .nm { font-weight: bold; font-size: 12.5px; line-height: 1.15; min-height: 28px; display: flex; align-items: center; justify-content: center; }
+  .card .tp { font-size: 10px; text-transform: uppercase; letter-spacing: .5px; color: #6b6f66; margin-top: 2px; }
+  .card .st { font-size: 12px; font-weight: bold; margin-top: 4px; }
+  .card .tx { font-size: 11px; line-height: 1.25; color: #3c423a; margin-top: 4px; min-height: 28px; }
+  .card .sm { font-size: 11px; color: #6b6f66; margin-top: 3px; }
+  .card.rare { border-color: #438b71; }
+  .card.epic { border-color: #527bb8; }
+  .card.legendary { border-color: #bf7d24; }
+  .card.exclusive { border-color: #9a6d1d; }
+  .card.spell { border-style: dashed; }
+  .card.selected { outline: 3px solid #c84f2b; outline-offset: 1px; }
+  .card.summoning { opacity: .62; border-style: dashed; }
+  .card.ready { cursor: pointer; }
+  .card.attacked { opacity: .55; }
+  .card.targetable { cursor: pointer; outline: 3px solid #c84f2b; outline-offset: 1px; animation: pulse 1s infinite; }
+  .card.notyourturn { cursor: default; }
+  .card.super { border-color: #e8a33d; box-shadow: 0 0 0 1px #e8a33d inset; }
+  .card .poison { position: absolute; top: -7px; right: -5px; background: #5b7a3a; color: #fff; font-size: 10px; font-weight: bold; border-radius: 8px; padding: 1px 6px; }
+  .card .superbadge { position: absolute; top: -7px; left: -5px; background: #e8a33d; color: #20261f; font-size: 10px; font-weight: bold; border-radius: 8px; padding: 1px 6px; }
+  .hint { text-align: center; font-size: 14px; min-height: 20px; margin: 4px 0; color: #3c423a; }
+  .hint b { color: #c84f2b; }
+  .btn { display: block; width: 100%; padding: 12px; font-size: 17px; font-weight: bold; font-family: inherit; background: #c84f2b; color: #fffdf7; border: none; border-radius: 10px; cursor: pointer; }
+  .btn:disabled { background: #b9b3a2; cursor: default; }
+  .btn.ghost { background: #fffdf7; color: #20261f; border: 2px solid #20261f; }
+  .log { font-size: 13px; line-height: 1.45; max-height: 118px; overflow-y: auto; }
+  .log div { padding: 1px 0; border-bottom: 1px solid #efe9da; }
+  .log div:last-child { border-bottom: none; }
+  details { font-size: 13.5px; line-height: 1.5; }
+  details summary { cursor: pointer; font-weight: bold; font-size: 14px; }
+  details ul { margin: 6px 0 2px; padding-left: 20px; }
+  .overlay { position: fixed; inset: 0; background: rgba(32,38,31,.72); display: none; align-items: center; justify-content: center; z-index: 10; padding: 20px; }
+  .overlay.show { display: flex; }
+  .overlay .box { background: #fffdf7; border-radius: 14px; padding: 22px 20px; text-align: center; max-width: 340px; width: 100%; }
+  .overlay h2 { margin: 0 0 6px; font-size: 26px; }
+  .overlay p { margin: 0 0 14px; color: #3c423a; font-size: 15px; }
+  .turntag { font-size: 12px; font-weight: bold; color: #6b6f66; text-transform: uppercase; letter-spacing: 1px; }
+  .battle { font-size: 15px; line-height: 1.6; }
+  .battlerow { display: flex; align-items: center; gap: 6px; margin: 2px 0; }
+  .battlerow .bname { font-weight: bold; min-width: 110px; }
+  .die { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border: 2px solid #20261f; border-radius: 6px; background: #fffdf7; font-weight: bold; font-size: 15px; }
+  .bresult { font-weight: bold; margin-top: 4px; }
+  .bresult.win { color: #438b71; }
+  .bresult.lose { color: #7a1f1f; }
+  .deckgrid { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0; }
+  .deckcard { flex: 1 1 30%; min-width: 150px; background: #fffdf7; border: 2px solid #788879; border-radius: 10px; padding: 6px; text-align: center; }
+  .deckcard.rare { border-color: #438b71; }
+  .deckcard.epic { border-color: #527bb8; }
+  .deckcard.legendary { border-color: #bf7d24; }
+  .deckcard.exclusive { border-color: #9a6d1d; }
+  .deckcard.spell { border-style: dashed; }
+  .deckcard .dnm { font-weight: bold; font-size: 12.5px; line-height: 1.15; }
+  .deckcard .dst { font-size: 11px; color: #3c423a; margin-top: 2px; min-height: 26px; }
+  .deckcard .dctl { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 5px; }
+  .deckcard .dctl button { width: 30px; height: 30px; font-size: 18px; font-weight: bold; font-family: inherit; background: #fffdf7; color: #20261f; border: 2px solid #20261f; border-radius: 8px; cursor: pointer; line-height: 1; }
+  .deckcard .dcnt { font-size: 16px; font-weight: bold; min-width: 18px; text-align: center; }
+  .deckcount { font-size: 18px; font-weight: bold; text-align: center; margin: 6px 0; }
+  .deckbtns { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Monster Master</h1>
+  <div class="sub">A recreation of the Miniplay card game — starring the Embark plushies</div>
+
+  <div class="panel">
+    <details>
+      <summary>How to play</summary>
+      <ul>
+        <li>Reduce the rival to <b>0 HP</b> to win. You both start at <b>20 HP</b>.</li>
+        <li>Each turn you draw a card. Play <b>one monster</b> per turn — and as many spells as you like.</li>
+        <li><b>Monsters</b> take a few turns to summon (shown on the card). While summoning they can't attack.</li>
+        <li><b>Battles are dice rolls.</b> Tap one of your ready monsters, then tap a rival monster. The attacker rolls <b>ATK + a 6-sided die</b>, the defender rolls <b>DEF + a 6-sided die</b>. Whoever rolls higher wins — the loser takes damage equal to the <b>difference</b>. Equal rolls: no damage. If the rival has no monsters, your monster hits the rival directly for its ATK. Each of your ready monsters can attack once per turn. The rolls and the result show in the <b>Last battle</b> box.</li>
+        <li><b>Poison:</b> Bog Frog and Ink Squid poison the loser whenever they <b>win</b> a battle, attacking or defending. A poisoned monster takes 2 damage at the start of its owner's next 2 turns. Mist Unicorn is immune to poison.</li>
+        <li><b>Monster abilities:</b> Void Invader has <b>Life Drain</b> (heals by the damage it deals when it wins a battle). Kernal Acorn has <b>Thorns</b> (deals 1 damage back even when it loses). Pond Turtle is a <b>Guardian</b> (the rival must attack it first). Atlas has <b>Rally</b> (your other monsters gain +1 ATK when it enters). Dragon Lord is <b>immune to spells</b>.</li>
+        <li><b>Combine:</b> monsters with the same symbol can fuse into a super monster. The symbol is the monster's rarity (the border color). Play a <b>Combine</b> card, then tap two of your monsters with the same symbol — they merge into a super monster with boosted ATK/DEF and their HP added together, ready to attack right away.</li>
+        <li><b>Spells:</b> Fireball (3 damage to a monster), Lightning Strike (2 damage to an enemy monster), Swamp (1 damage to <b>every</b> monster), Sword (one of your monsters +2 ATK), Weaken (an enemy monster −3 ATK), Curse (an enemy monster −1 ATK and −1 DEF), Sacrifice (destroy one of your monsters to heal 4 HP), Heal (+4 HP to one of your monsters), Poison (a monster takes 2 damage for 2 turns), Combine (fuse two same-symbol monsters), Shield (one of your monsters +2 DEF), Freeze (an enemy monster can't attack next turn), Revive (bring your strongest destroyed monster back at half HP), Meteor (2 damage to all enemy monsters), Haste (your summoning monsters finish 1 turn sooner), Double Strike (one of your monsters attacks twice this turn), Blessing (heal your own HP by 4).</li>
+        <li>Tap <b>End Turn</b> when you're done. The rival plays, then it's your turn again.</li>
+        <li><b>Build your own deck:</b> before a game, pick <b>30 cards</b> (max <b>2 copies</b> of each type). The rival plays with the same deck, shuffled separately. Or tap <b>Random Deck</b> for a surprise build, or <b>Use Default Deck</b> for the full 49-card deck.</li>
+      </ul>
+    </details>
+  </div>
+
+  <div class="panel" id="deckBuilder">
+    <div class="label" style="margin-top:0">Build your deck</div>
+    <div style="font-size:13.5px; line-height:1.5;">Pick <b>30 cards</b>, max <b>2 copies</b> of each type. The rival plays with the same deck, shuffled separately. Tap <b>+</b> to add a copy, <b>&minus;</b> to take one out.</div>
+    <div class="deckcount" id="deckCountLabel">0 / 30 cards</div>
+    <div class="label">Monsters</div>
+    <div class="deckgrid" id="deckMonsters"></div>
+    <div class="label">Spells</div>
+    <div class="deckgrid" id="deckSpells"></div>
+    <div class="deckbtns">
+      <button class="btn" id="deckStartBtn" onclick="deckStart()" disabled>Start Game</button>
+      <button class="btn ghost" onclick="deckRandom()">Random Deck</button>
+      <button class="btn ghost" onclick="deckClear()">Clear</button>
+      <button class="btn ghost" onclick="deckUseDefault()">Use Default Deck (49 cards)</button>
+    </div>
+  </div>
+
+  <div id="gameBoard" style="display:none">
+  <div class="panel">
+    <div class="row">
+      <div class="avatar rival" id="rivalAvatar">R</div>
+      <div>
+        <div class="who">Rival</div>
+        <div class="turntag" id="rivalTag"></div>
+      </div>
+      <div class="hpbar"><div class="hpfill" id="rivalHpFill" style="width:100%"></div></div>
+      <div class="hpnum" id="rivalHpNum">20 / 20</div>
+    </div>
+    <div class="label">Rival's monsters <span id="rivalHandCount"></span></div>
+    <div class="field" id="rivalField"></div>
+  </div>
+
+  <div class="panel" id="battlePanel">
+    <div class="label" style="margin-top:0">Last battle</div>
+    <div class="battle" id="battleResult">No battle yet — tap a ready monster, then a rival monster to fight.</div>
+  </div>
+
+  <div class="hint" id="hint"></div>
+  <div class="row" style="margin-bottom:8px;">
+    <button class="btn" id="endTurnBtn" onclick="onEndTurn()">End Turn</button>
+  </div>
+
+  <div class="panel">
+    <div class="row">
+      <div class="avatar you">Y</div>
+      <div>
+        <div class="who">You</div>
+        <div class="turntag" id="youTag"></div>
+      </div>
+      <div class="hpbar"><div class="hpfill" id="youHpFill" style="width:100%"></div></div>
+      <div class="hpnum" id="youHpNum">20 / 20</div>
+    </div>
+    <div class="label">Your monsters</div>
+    <div class="field" id="youField"></div>
+    <div class="label">Your hand <span id="deckCount"></span></div>
+    <div class="hand" id="youHand"></div>
+  </div>
+
+  <div class="panel">
+    <div class="label" style="margin-top:0">Battle log</div>
+    <div class="log" id="log"></div>
+  </div>
+  </div>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="box">
+    <h2 id="overTitle"></h2>
+    <p id="overText"></p>
+    <button class="btn" onclick="newGame()">Play again</button>
+    <button class="btn ghost" style="margin-top:8px" onclick="showDeckBuilder()">Change Deck</button>
+  </div>
+</div>
+
+<script>
+/* ---- Card library ---- */
+var MONSTERS = [
+  { id:'cuddle-cub', name:'Cuddle Cub', atk:2, def:2, hp:3, summon:1, rarity:'common', color:'#788879' },
+  { id:'bog-frog', name:'Bog Frog', atk:3, def:1, hp:2, summon:1, rarity:'common', color:'#788879', poison:true },
+  { id:'meadow-bunny', name:'Meadow Bunny', atk:2, def:2, hp:4, summon:1, rarity:'common', color:'#788879' },
+  { id:'dawn-chick', name:'Dawn Chick', atk:3, def:2, hp:3, summon:2, rarity:'common', color:'#788879' },
+  { id:'pond-turtle', name:'Pond Turtle', atk:1, def:4, hp:6, summon:1, rarity:'common', color:'#788879', guardian:true },
+  { id:'ember-drake', name:'Ember Drake', atk:4, def:2, hp:3, summon:2, rarity:'rare', color:'#438b71' },
+  { id:'mist-unicorn', name:'Mist Unicorn', atk:3, def:3, hp:4, summon:2, rarity:'rare', color:'#438b71', immunePoison:true },
+  { id:'ink-squid', name:'Ink Squid', atk:4, def:1, hp:2, summon:2, rarity:'rare', color:'#438b71', poison:true },
+  { id:'foxfire-fox', name:'Foxfire Fox', atk:3, def:2, hp:3, summon:1, rarity:'rare', color:'#438b71' },
+  { id:'kernal-acorn', name:'Kernal Acorn', atk:2, def:3, hp:5, summon:2, rarity:'rare', color:'#438b71', thorns:true },
+  { id:'dragon-lord', name:'Dragon Lord', atk:6, def:3, hp:5, summon:3, rarity:'epic', color:'#527bb8', spellImmune:true },
+  { id:'void-invader', name:'Void Invader', atk:5, def:2, hp:4, summon:3, rarity:'epic', color:'#527bb8', lifeDrain:true },
+  { id:'celestial-whale', name:'Celestial Whale', atk:5, def:4, hp:7, summon:3, rarity:'legendary', color:'#bf7d24' },
+  { id:'atlas', name:'Atlas', atk:7, def:3, hp:6, summon:4, rarity:'legendary', color:'#bf7d24', rally:true },
+  { id:'aurelia', name:'Aurelia', atk:8, def:4, hp:7, summon:4, rarity:'exclusive', color:'#9a6d1d' }
+];
+var SPELLS = [
+  { id:'fireball', name:'Fireball', text:'Deal 3 damage to a monster.', target:'enemyMonster', dmg:3 },
+  { id:'lightning', name:'Lightning Strike', text:'Deal 2 damage to an enemy monster.', target:'enemyMonster', dmg:2 },
+  { id:'swamp', name:'Swamp', text:'Deal 1 damage to every monster on the field.', target:'all' },
+  { id:'sword', name:'Sword', text:'One of your monsters gains +2 ATK.', target:'allyMonster', buff:2 },
+  { id:'weaken', name:'Weaken', text:'An enemy monster loses 3 ATK.', target:'enemyMonster', debuff:3 },
+  { id:'curse', name:'Curse', text:'An enemy monster loses 1 ATK and 1 DEF.', target:'enemyMonster', curse:true },
+  { id:'sacrifice', name:'Sacrifice', text:'Destroy one of your monsters to heal 4 HP.', target:'sacrifice' },
+  { id:'heal', name:'Heal', text:'Restore 4 HP to one of your monsters.', target:'allyMonster', heal:4 },
+  { id:'poison', name:'Poison', text:'A monster takes 2 damage at the start of its next 2 turns.', target:'enemyMonster', poison:true },
+  { id:'combine', name:'Combine', text:'Fuse two of your monsters with the same symbol into a super monster.', target:'combine' },
+  { id:'shield', name:'Shield', text:'One of your monsters gains +2 DEF.', target:'allyMonster', buffDef:2 },
+  { id:'freeze', name:'Freeze', text:'An enemy monster can\u2019t attack on its next turn.', target:'enemyMonster', freeze:true },
+  { id:'revive', name:'Revive', text:'Bring your strongest destroyed monster back at half HP, ready to fight.', target:'revive' },
+  { id:'meteor', name:'Meteor', text:'Deal 2 damage to all enemy monsters.', target:'enemyField', dmg:2 },
+  { id:'haste', name:'Haste', text:'All your summoning monsters finish 1 turn sooner.', target:'self' },
+  { id:'double-strike', name:'Double Strike', text:'One of your monsters attacks twice this turn.', target:'allyMonster', doubleStrike:true },
+  { id:'blessing', name:'Blessing', text:'Heal your own HP by 4.', target:'self', healSelf:4 }
+];
+var MAX_HP = 20, FIELD_MAX = 5, HAND_START = 5;
+
+/* ---- State ---- */
+var S = null;
+function freshState(){
+  return {
+    turn: 'you', turnCount: 1, busy: false, over: false,
+    sel: null, // {type:'spell', idx} or {type:'attack', idx} or {type:'combine', idx, picked:[]}
+    you: { hp: MAX_HP, deck: [], hand: [], field: [], discard: [], playedMonster: false },
+    ai:  { hp: MAX_HP, deck: [], hand: [], field: [], discard: [], playedMonster: false },
+    log: []
+  };
+}
+function buildDeck(){
+  var d = [];
+  MONSTERS.forEach(function(m){ d.push({ kind:'monster', id:m.id, name:m.name, atk:m.atk, def:m.def, hp:m.hp, summon:m.summon, rarity:m.rarity, color:m.color, immunePoison:!!m.immunePoison, poison:!!m.poison, lifeDrain:!!m.lifeDrain, thorns:!!m.thorns, guardian:!!m.guardian, rally:!!m.rally, spellImmune:!!m.spellImmune }); });
+  var spellCounts = { fireball:2, lightning:2, swamp:2, sword:2, weaken:2, sacrifice:2, heal:2, poison:2, combine:2, curse:2, shield:2, freeze:2, revive:2, meteor:2, haste:2, 'double-strike':2, blessing:2 };
+  SPELLS.forEach(function(s){
+    for (var i=0;i<(spellCounts[s.id]||1);i++){
+      d.push({ kind:'spell', id:s.id, name:s.name, text:s.text, target:s.target, dmg:s.dmg||0, heal:s.heal||0, buff:s.buff||0, debuff:s.debuff||0, buffDef:s.buffDef||0, freeze:!!s.freeze, doubleStrike:!!s.doubleStrike, healSelf:s.healSelf||0, poison:!!s.poison, curse:!!s.curse });
+    }
+  });
+  // shuffle
+  for (var i=d.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=d[i]; d[i]=d[j]; d[j]=t; }
+  return d;
+}
+/* ---- Deck builder: your own 30-card deck, max 2 of each type ---- */
+var customDeck = null; // counts by card id, or null = default 49-card deck
+function builderCounts(){ return customDeck || {}; }
+function builderTotal(){
+  var t = 0, c = builderCounts();
+  Object.keys(c).forEach(function(k){ t += c[k]; });
+  return t;
+}
+function deckCardHtml(c){
+  var n = (customDeck && customDeck[c.id]) || 0;
+  var isMonster = c.atk !== undefined;
+  var cls = 'deckcard ' + (c.rarity || 'spell');
+  var info = isMonster
+    ? '<div class="dnm">' + esc(c.name) + '</div><div class="dst">ATK ' + c.atk + ' &middot; DEF ' + c.def + ' &middot; HP ' + c.hp + ' &middot; Summon ' + c.summon + '</div>'
+    : '<div class="dnm">' + esc(c.name) + '</div><div class="dst">' + esc(c.text) + '</div>';
+  return '<div class="' + cls + '">' + info +
+    '<div class="dctl"><button onclick="deckRemove(\'' + c.id + '\')">&minus;</button>' +
+    '<span class="dcnt">' + n + '</span>' +
+    '<button onclick="deckAdd(\'' + c.id + '\')">+</button></div></div>';
+}
+function renderDeckBuilder(){
+  var mHtml = '', sHtml = '';
+  MONSTERS.forEach(function(m){ mHtml += deckCardHtml(m); });
+  SPELLS.forEach(function(s){ sHtml += deckCardHtml(s); });
+  document.getElementById('deckMonsters').innerHTML = mHtml;
+  document.getElementById('deckSpells').innerHTML = sHtml;
+  var total = builderTotal();
+  document.getElementById('deckCountLabel').textContent = total + ' / 30 cards';
+  document.getElementById('deckStartBtn').disabled = (total !== 30);
+}
+function deckAdd(id){
+  if (!customDeck) customDeck = {};
+  if (builderTotal() >= 30) return;
+  if ((customDeck[id] || 0) >= 2) return;
+  customDeck[id] = (customDeck[id] || 0) + 1;
+  renderDeckBuilder();
+}
+function deckRemove(id){
+  if (!customDeck) return;
+  if ((customDeck[id] || 0) <= 0) return;
+  customDeck[id]--;
+  if (customDeck[id] === 0) delete customDeck[id];
+  renderDeckBuilder();
+}
+function deckRandom(){
+  customDeck = {};
+  var pool = [];
+  MONSTERS.forEach(function(m){ pool.push(m.id); pool.push(m.id); });
+  SPELLS.forEach(function(s){ pool.push(s.id); pool.push(s.id); });
+  for (var i=pool.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=pool[i]; pool[i]=pool[j]; pool[j]=t; }
+  for (var k=0;k<30;k++){ customDeck[pool[k]] = (customDeck[pool[k]] || 0) + 1; }
+  renderDeckBuilder();
+}
+function deckClear(){
+  customDeck = {};
+  renderDeckBuilder();
+}
+function deckStart(){
+  if (builderTotal() !== 30) return;
+  document.getElementById('deckBuilder').style.display = 'none';
+  document.getElementById('gameBoard').style.display = '';
+  newGame();
+}
+function deckUseDefault(){
+  customDeck = null;
+  document.getElementById('deckBuilder').style.display = 'none';
+  document.getElementById('gameBoard').style.display = '';
+  newGame();
+}
+function showDeckBuilder(){
+  document.getElementById('deckBuilder').style.display = '';
+  document.getElementById('gameBoard').style.display = 'none';
+  document.getElementById('overlay').className = 'overlay';
+  renderDeckBuilder();
+}
+function buildDeckFromCounts(counts){
+  var d = [];
+  MONSTERS.forEach(function(m){
+    var n = counts[m.id] || 0;
+    for (var i=0;i<n;i++){
+      d.push({ kind:'monster', id:m.id, name:m.name, atk:m.atk, def:m.def, hp:m.hp, summon:m.summon, rarity:m.rarity, color:m.color, immunePoison:!!m.immunePoison, poison:!!m.poison, lifeDrain:!!m.lifeDrain, thorns:!!m.thorns, guardian:!!m.guardian, rally:!!m.rally, spellImmune:!!m.spellImmune });
+    }
+  });
+  SPELLS.forEach(function(s){
+    var n = counts[s.id] || 0;
+    for (var i=0;i<n;i++){
+      d.push({ kind:'spell', id:s.id, name:s.name, text:s.text, target:s.target, dmg:s.dmg||0, heal:s.heal||0, buff:s.buff||0, debuff:s.debuff||0, buffDef:s.buffDef||0, freeze:!!s.freeze, doubleStrike:!!s.doubleStrike, healSelf:s.healSelf||0, poison:!!s.poison, curse:!!s.curse });
+    }
+  });
+  for (var i=d.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=d[i]; d[i]=d[j]; d[j]=t; }
+  return d;
+}
+function log(msg){
+  S.log.unshift(msg);
+  if (S.log.length > 40) S.log.length = 40;
+}
+function sideName(side){ return side==='you' ? 'You' : 'Rival'; }
+function rollDie(){ return 1 + Math.floor(Math.random()*6); }
+
+/* ---- Game flow ---- */
+function newGame(){
+  S = freshState();
+  if (customDeck){
+    S.you.deck = buildDeckFromCounts(customDeck);
+    S.ai.deck = buildDeckFromCounts(customDeck);
+  } else {
+    S.you.deck = buildDeck();
+    S.ai.deck = buildDeck();
+  }
+  for (var i=0;i<HAND_START;i++){ drawCard('you', true); drawCard('ai', true); }
+  document.getElementById('overlay').className = 'overlay';
+  log('Game started. You draw 5 cards. Good luck!');
+  render();
+}
+function drawCard(side, silent){
+  var P = S[side];
+  if (P.deck.length === 0){
+    if (P.discard.length === 0) return false;
+    P.deck = P.discard; P.discard = [];
+    for (var i=P.deck.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=P.deck[i]; P.deck[i]=P.deck[j]; P.deck[j]=t; }
+    if (!silent) log(sideName(side) + ' reshuffles the discard pile into the deck.');
+  }
+  P.hand.push(P.deck.pop());
+  return true;
+}
+function makeFieldMonster(card){
+  return { id:card.id, name:card.name, atk:card.atk, def:card.def, hp:card.hp, maxHp:card.hp, summon:card.summon, summonLeft:card.summon, rarity:card.rarity, color:card.color, immunePoison:card.immunePoison, poisonAbility:card.poison, lifeDrain:card.lifeDrain, thorns:card.thorns, guardian:card.guardian, rally:card.rally, spellImmune:card.spellImmune, canAttack:false, frozen:0, extraAttacks:0, poison:0, super:false, card:card };
+}
+function hasGuardian(side){
+  for (var i=0;i<S[side].field.length;i++){ if (S[side].field[i].guardian) return i; }
+  return -1;
+}
+function applyRally(side){
+  // a Rally monster (Atlas) just entered: your other monsters get +1 ATK
+  S[side].field.forEach(function(m){ if (!m.rally) m.atk += 1; });
+  log(sideName(side) + "'s Atlas rallies the field — your other monsters gain +1 ATK.");
+}
+function reviveTarget(side){
+  // the strongest destroyed monster in that side's discard pile (or null)
+  var best = null;
+  S[side].discard.forEach(function(c){
+    if (c.kind !== 'monster') return;
+    if (!best || c.atk > best.atk) best = c;
+  });
+  return best;
+}
+function startTurn(side){
+  S.turn = side;
+  if (side === 'you'){ S.busy = false; }
+  var P = S[side];
+  P.playedMonster = false;
+  drawCard(side);
+  if (side === 'ai') log('Rival draws a card.');
+  // summon timers tick (frozen monsters thaw one turn at a time)
+  P.field.forEach(function(m){
+    if (m.frozen > 0){
+      m.frozen--;
+      if (m.frozen === 0){ log(m.name + ' thaws out.'); }
+    }
+    if (m.summonLeft > 0){
+      m.summonLeft--;
+      if (m.summonLeft === 0){ m.canAttack = !m.frozen; if (m.canAttack) log(sideName(side) + "'s " + m.name + ' is ready!'); }
+    } else { m.canAttack = !m.frozen; }
+  });
+  // poison ticks
+  for (var i=P.field.length-1;i>=0;i--){
+    var m = P.field[i];
+    if (m.poison > 0 && !m.immunePoison){
+      m.hp -= 2; m.poison--;
+      log(m.name + ' takes 2 poison damage.');
+      if (m.hp <= 0){ killMonster(side, i, true); }
+    } else if (m.poison > 0){ m.poison--; }
+  }
+  S.sel = null;
+  if (side === 'ai'){ aiTakeTurn(); }
+  render();
+}
+function killMonster(side, idx, quiet){
+  var m = S[side].field[idx];
+  if (!m) return;
+  S[side].field.splice(idx, 1);
+  S[side].discard.push(m.card);
+  if (!quiet) log(m.name + ' is destroyed.');
+}
+function checkWin(){
+  if (S.over) return;
+  if (S.ai.hp <= 0){ S.over = true; showOver(true); }
+  else if (S.you.hp <= 0){ S.over = true; showOver(false); }
+}
+function showOver(won){
+  document.getElementById('overTitle').textContent = won ? 'You win!' : 'Rival wins';
+  document.getElementById('overText').textContent = won
+    ? 'The rival is down to 0 HP. You are the Monster Master.'
+    : 'Your HP hit 0. The rival takes this one — rematch?';
+  document.getElementById('overlay').className = 'overlay show';
+}
+function onEndTurn(){
+  if (S.busy || S.over || S.turn !== 'you') return;
+  S.sel = null;
+  S.turnCount++;
+  log('--- Turn ' + S.turnCount + ' ---');
+  startTurn('ai');
+}
+
+/* ---- Combine ---- */
+function doCombine(side, handIdx, idx1, idx2){
+  var P = S[side];
+  var card = P.hand[handIdx];
+  var m1 = P.field[idx1], m2 = P.field[idx2];
+  if (!card || !m1 || !m2 || m1.rarity !== m2.rarity) return false;
+  P.hand.splice(handIdx, 1);
+  P.discard.push(card);
+  var sup = {
+    id: m1.id, name: 'Super ' + m1.name,
+    atk: Math.max(m1.atk, m2.atk) + 2,
+    def: Math.max(m1.def, m2.def) + 2,
+    hp: m1.hp + m2.hp, maxHp: m1.maxHp + m2.maxHp,
+    summon: 0, summonLeft: 0, rarity: m1.rarity, color: m1.color,
+    immunePoison: m1.immunePoison || m2.immunePoison,
+    poisonAbility: m1.poisonAbility || m2.poisonAbility,
+    canAttack: true, poison: 0, super: true, card: m1.card
+  };
+  var lo = Math.min(idx1, idx2), hi = Math.max(idx1, idx2);
+  P.field.splice(hi, 1);
+  P.field.splice(lo, 1);
+  P.field.splice(lo, 0, sup);
+  log(sideName(side) + ' combines ' + m1.name + ' and ' + m2.name + ' into ' + sup.name + ' (ATK ' + sup.atk + ', DEF ' + sup.def + ', HP ' + sup.hp + ')!');
+  S.sel = null;
+  render();
+  return true;
+}
+
+/* ---- Player actions ---- */
+function onHand(i){
+  if (S.busy || S.over || S.turn !== 'you') return;
+  var c = S.you.hand[i];
+  if (!c) return;
+  if (c.kind === 'monster'){
+    if (S.you.playedMonster){ log('One monster per turn — you already played one.'); render(); return; }
+    if (S.you.field.length >= FIELD_MAX){ log('Your field is full (5 monsters max).'); render(); return; }
+    S.you.hand.splice(i, 1);
+    S.you.field.push(makeFieldMonster(c));
+    S.you.playedMonster = true;
+    if (c.rally) applyRally('you');
+    log('You summon ' + c.name + ' (' + c.summon + ' turn' + (c.summon>1?'s':'') + ' to summon).');
+    S.sel = null;
+    render();
+  } else {
+    if (c.target === 'all'){
+      castSpell('you', i, { type:'all' });
+      return;
+    }
+    if (c.target === 'enemyField' || c.target === 'self'){
+      castSpell('you', i, { type:c.target });
+      return;
+    }
+    if (c.id === 'revive'){
+      if (!reviveTarget('you')){ log('No destroyed monster to revive.'); render(); return; }
+      if (S.you.field.length >= FIELD_MAX){ log('Your field is full (5 monsters max).'); render(); return; }
+      castSpell('you', i, { type:'revive' });
+      return;
+    }
+    if (c.id === 'combine'){
+      S.sel = (S.sel && S.sel.type==='combine' && S.sel.idx===i) ? null : { type:'combine', idx:i, picked:[] };
+      render();
+      return;
+    }
+    S.sel = (S.sel && S.sel.type==='spell' && S.sel.idx===i) ? null : { type:'spell', idx:i };
+    render();
+  }
+}
+function hasCombinePartner(field, idx){
+  var m = field[idx];
+  if (!m) return false;
+  for (var j=0;j<field.length;j++){ if (j !== idx && field[j].rarity === m.rarity) return true; }
+  return false;
+}
+function onMyMonster(i){
+  if (S.busy || S.over || S.turn !== 'you') return;
+  var m = S.you.field[i];
+  if (!m) return;
+  // combine picking
+  if (S.sel && S.sel.type === 'combine'){
+    if (!hasCombinePartner(S.you.field, i)){ log(m.name + ' has no same-symbol partner to combine with.'); render(); return; }
+    var picked = S.sel.picked;
+    var at = picked.indexOf(i);
+    if (at >= 0){ picked.splice(at, 1); render(); return; }
+    if (picked.length === 0){ picked.push(i); render(); return; }
+    if (picked.length === 1){
+      var first = S.you.field[picked[0]];
+      if (!first || first.rarity !== m.rarity){
+        log('Those two don\'t share a symbol — pick two with the same symbol (rarity).');
+        S.sel.picked = [i];
+        render();
+        return;
+      }
+      doCombine('you', S.sel.idx, picked[0], i);
+      return;
+    }
+    return;
+  }
+  // targeting with a spell that hits allies?
+  if (S.sel && S.sel.type === 'spell'){
+    var c = S.you.hand[S.sel.idx];
+    if (c && (c.target === 'allyMonster' || c.target === 'sacrifice')){ castSpell('you', S.sel.idx, { type:'monster', side:'you', idx:i }); return; }
+  }
+  // attack selection
+  if (m.frozen > 0){ log(m.name + ' is frozen and can\u2019t attack.'); render(); return; }
+  if (m.summonLeft > 0){ log(m.name + ' is still summoning (' + m.summonLeft + ' turn' + (m.summonLeft>1?'s':'') + ' left).'); render(); return; }
+  if (!m.canAttack){ log(m.name + ' already attacked this turn.'); render(); return; }
+  S.sel = (S.sel && S.sel.type==='attack' && S.sel.idx===i) ? null : { type:'attack', idx:i };
+  render();
+}
+function onEnemyMonster(i){
+  if (S.busy || S.over || S.turn !== 'you') return;
+  if (S.sel && S.sel.type === 'spell'){
+    var c = S.you.hand[S.sel.idx];
+    if (c && c.target === 'enemyMonster'){
+      if (S.ai.field[i] && S.ai.field[i].spellImmune){ log(S.ai.field[i].name + ' is immune to spells.'); render(); return; }
+      if (c.poison && S.ai.field[i] && S.ai.field[i].immunePoison){ log(S.ai.field[i].name + ' is immune to poison.'); render(); return; }
+      castSpell('you', S.sel.idx, { type:'monster', side:'ai', idx:i });
+      return;
+    }
+  }
+  if (S.sel && S.sel.type === 'attack'){
+    var g = hasGuardian('ai');
+    if (g >= 0 && i !== g){ log('You must attack the Guardian (' + S.ai.field[g].name + ') first.'); render(); return; }
+    var m = S.you.field[S.sel.idx];
+    if (m){ doAttack('you', m, { type:'monster', side:'ai', idx:i }); }
+    return;
+  }
+}
+function onEnemyPlayer(){
+  if (S.busy || S.over || S.turn !== 'you') return;
+  if (S.sel && S.sel.type === 'attack'){
+    if (S.ai.field.length > 0){ log('The rival still has monsters — you must fight through them first.'); render(); return; }
+    var m = S.you.field[S.sel.idx];
+    if (m){ doAttack('you', m, { type:'player', side:'ai' }); }
+    return;
+  }
+}
+function castSpell(side, handIdx, target){
+  var P = S[side];
+  var c = P.hand[handIdx];
+  if (!c) return;
+  P.hand.splice(handIdx, 1);
+  P.discard.push(c);
+  var foe = side==='you' ? 'ai' : 'you';
+  if (target.type === 'all'){
+    // Swamp: 1 damage to every monster
+    ['you','ai'].forEach(function(s){
+      S[s].field.forEach(function(m){ m.hp -= 1; });
+    });
+    log(sideName(side) + ' casts Swamp — every monster takes 1 damage.');
+    ['you','ai'].forEach(function(s){
+      for (var i=S[s].field.length-1;i>=0;i--){
+        if (S[s].field[i].hp <= 0) killMonster(s, i);
+      }
+    });
+  } else if (target.type === 'enemyField'){
+    // Meteor: 2 damage to all enemy monsters
+    S[foe].field.forEach(function(m){ m.hp -= c.dmg; });
+    log(sideName(side) + ' casts Meteor — every enemy monster takes ' + c.dmg + ' damage.');
+    for (var i=S[foe].field.length-1;i>=0;i--){
+      if (S[foe].field[i].hp <= 0) killMonster(foe, i);
+    }
+  } else if (target.type === 'self'){
+    if (c.id === 'haste'){
+      var any = false;
+      P.field.forEach(function(m){
+        if (m.summonLeft > 0){
+          m.summonLeft--;
+          any = true;
+          if (m.summonLeft === 0){ m.canAttack = !m.frozen; log(m.name + ' is ready!'); }
+        }
+      });
+      log(sideName(side) + ' casts Haste — summoning monsters finish 1 turn sooner.' + (any ? '' : ' (nothing was summoning)'));
+    } else if (c.healSelf){
+      S[side].hp = Math.min(MAX_HP, S[side].hp + c.healSelf);
+      log(sideName(side) + ' casts Blessing — recovers ' + c.healSelf + ' HP.');
+    }
+  } else if (target.type === 'revive'){
+    var best = reviveTarget(side);
+    if (best && P.field.length < FIELD_MAX){
+      var di = P.discard.indexOf(best);
+      if (di >= 0) P.discard.splice(di, 1);
+      var rev = makeFieldMonster(best);
+      rev.hp = Math.max(1, Math.ceil(rev.maxHp / 2));
+      rev.summonLeft = 0;
+      rev.canAttack = true;
+      P.field.push(rev);
+      log(sideName(side) + ' casts Revive — ' + best.name + ' returns at ' + rev.hp + ' HP, ready to fight.');
+    } else {
+      log('Revive fizzles — no destroyed monster to bring back.');
+    }
+  } else if (target.type === 'monster'){
+    var m = S[target.side].field[target.idx];
+    if (!m){ S.sel = null; render(); return; }
+    if (c.id === 'sacrifice'){
+      log(sideName(side) + ' sacrifices ' + m.name + ' and recovers 4 HP.');
+      killMonster(target.side, target.idx, true);
+      S[side].hp = Math.min(MAX_HP, S[side].hp + 4);
+    } else {
+      if (c.dmg){ m.hp -= c.dmg; log(sideName(side) + ' casts ' + c.name + ' on ' + m.name + ' (' + c.dmg + ' damage).'); }
+      if (c.heal){ m.hp = Math.min(m.maxHp, m.hp + c.heal); log(sideName(side) + ' casts ' + c.name + ' on ' + m.name + ' (+' + c.heal + ' HP).'); }
+      if (c.buff){ m.atk += c.buff; log(sideName(side) + ' casts ' + c.name + ' on ' + m.name + ' (+' + c.buff + ' ATK).'); }
+      if (c.buffDef){ m.def += c.buffDef; log(sideName(side) + ' casts ' + c.name + ' on ' + m.name + ' (+' + c.buffDef + ' DEF).'); }
+      if (c.debuff){ m.atk = Math.max(0, m.atk - c.debuff); log(sideName(side) + ' casts ' + c.name + ' on ' + m.name + ' (-' + c.debuff + ' ATK).'); }
+      if (c.curse){ m.atk = Math.max(0, m.atk - 1); m.def = Math.max(0, m.def - 1); log(sideName(side) + ' casts ' + c.name + ' on ' + m.name + ' (-1 ATK, -1 DEF).'); }
+      if (c.freeze){ m.frozen = 2; m.canAttack = false; log(sideName(side) + ' freezes ' + m.name + ' — it can\u2019t attack on its next turn.'); }
+      if (c.doubleStrike){ m.extraAttacks = 1; m.canAttack = true; log(sideName(side) + ' casts ' + c.name + ' on ' + m.name + ' — it attacks twice this turn.'); }
+      if (c.poison){
+        if (m.immunePoison){ log(m.name + ' is immune to poison.'); }
+        else { m.poison = 2; log(sideName(side) + ' poisons ' + m.name + ' (2 damage for 2 turns).'); }
+      }
+      if (m.hp <= 0){ killMonster(target.side, target.idx); }
+    }
+  }
+  S.sel = null;
+  checkWin();
+  render();
+}
+function showBattle(html){
+  var el = document.getElementById('battleResult');
+  if (el) el.innerHTML = html;
+}
+function doAttack(side, m, target){
+  var foe = side==='you' ? 'ai' : 'you';
+  if (target.type === 'player'){
+    S[foe].hp -= m.atk;
+    log(sideName(side) + "'s " + m.name + ' hits ' + sideName(foe) + ' directly for ' + m.atk + '.');
+    showBattle('<div class="battlerow"><span class="bname">' + esc(m.name) + '</span><span>hits ' + sideName(foe) + ' directly</span></div>' +
+      '<div class="bresult' + (side === 'you' ? ' win' : ' lose') + '">Direct hit — ' + sideName(foe) + ' takes ' + m.atk + ' damage.</div>');
+  } else {
+    var def = S[foe].field[target.idx];
+    if (!def){ S.sel = null; render(); return; }
+    var atkDie = rollDie(), defDie = rollDie();
+    var atkTotal = m.atk + atkDie, defTotal = def.def + defDie;
+    var rows = '<div class="battlerow"><span class="bname">' + esc(m.name) + '</span><span>ATK ' + m.atk + ' + </span><span class="die">' + atkDie + '</span><span> = <b>' + atkTotal + '</b></span></div>' +
+      '<div class="battlerow"><span class="bname">' + esc(def.name) + '</span><span>DEF ' + def.def + ' + </span><span class="die">' + defDie + '</span><span> = <b>' + defTotal + '</b></span></div>';
+    if (atkTotal > defTotal){
+      var dmg = atkTotal - defTotal;
+      def.hp -= dmg;
+      log(sideName(side) + "'s " + m.name + ' rolls ' + m.atk + '+' + atkDie + '=' + atkTotal + ' vs ' + def.name + ' ' + def.def + '+' + defDie + '=' + defTotal + ' — wins by ' + dmg + ', ' + def.name + ' takes ' + dmg + ' damage.');
+      showBattle(rows + '<div class="bresult' + (side === 'you' ? ' win' : ' lose') + '">' + esc(m.name) + ' wins by ' + dmg + ' — ' + esc(def.name) + ' takes ' + dmg + ' damage.</div>');
+      if (m.poisonAbility && !def.immunePoison && def.hp > 0){ def.poison = 2; log(m.name + ' poisons ' + def.name + '!'); }
+      if (m.lifeDrain && m.hp > 0){
+        var healed = Math.min(m.maxHp - m.hp, dmg);
+        if (healed > 0){ m.hp += healed; log(m.name + ' drains ' + healed + ' HP.'); }
+      }
+      if (def.thorns && def.hp > 0 && m.hp > 0){
+        m.hp -= 1;
+        log(def.name + "'s thorns deal 1 damage back to " + m.name + '.');
+      }
+      if (def.hp <= 0){ killMonster(foe, target.idx); }
+      var mi2 = S[side].field.indexOf(m);
+      if (m.hp <= 0 && mi2 >= 0){ killMonster(side, mi2); }
+    } else if (defTotal > atkTotal){
+      var dmg2 = defTotal - atkTotal;
+      m.hp -= dmg2;
+      log(def.name + ' rolls ' + def.def + '+' + defDie + '=' + defTotal + ' vs ' + m.name + ' ' + m.atk + '+' + atkDie + '=' + atkTotal + ' — wins by ' + dmg2 + ', ' + m.name + ' takes ' + dmg2 + ' damage.');
+      showBattle(rows + '<div class="bresult' + (side === 'you' ? ' lose' : ' win') + '">' + esc(def.name) + ' wins by ' + dmg2 + ' — ' + esc(m.name) + ' takes ' + dmg2 + ' damage.</div>');
+      if (def.poisonAbility && !m.immunePoison && m.hp > 0){ m.poison = 2; log(def.name + ' poisons ' + m.name + '!'); }
+      if (def.lifeDrain && def.hp > 0){
+        var healed2 = Math.min(def.maxHp - def.hp, dmg2);
+        if (healed2 > 0){ def.hp += healed2; log(def.name + ' drains ' + healed2 + ' HP.'); }
+      }
+      if (m.thorns && m.hp > 0 && def.hp > 0){
+        def.hp -= 1;
+        log(m.name + "'s thorns deal 1 damage back to " + def.name + '.');
+      }
+      var mi = S[side].field.indexOf(m);
+      if (m.hp <= 0 && mi >= 0){ killMonster(side, mi); }
+      if (def.hp <= 0){ killMonster(foe, target.idx); }
+    } else {
+      log(m.name + ' and ' + def.name + ' roll equal (' + atkTotal + ') — no damage.');
+      showBattle(rows + '<div class="bresult">Tie (' + atkTotal + ' vs ' + defTotal + ') — no damage.</div>');
+    }
+  }
+  if (m.extraAttacks > 0){ m.extraAttacks--; /* Double Strike: still ready for the bonus swing */ }
+  else { m.canAttack = false; }
+  S.sel = null;
+  checkWin();
+  render();
+}
+
+/* ---- Rival AI ---- */
+function aiTakeTurn(){
+  S.busy = true;
+  var steps = [
+    function(){ aiPlayMonsters(); },
+    function(){ aiCastSpells(); },
+    function(){ aiAttack(); },
+    function(){ startTurn('you'); }
+  ];
+  var i = 0;
+  (function next(){
+    if (S.over) return;
+    if (i < steps.length){ steps[i](); render(); i++; setTimeout(next, 800); }
+  })();
+}
+function aiPlayMonsters(){
+  var played = 0;
+  while (played < 1 && S.ai.field.length < FIELD_MAX){
+    var best = -1, bestScore = -1;
+    S.ai.hand.forEach(function(c, i){
+      if (c.kind !== 'monster') return;
+      var score = (10 - c.summon) * 10 + c.atk;
+      if (score > bestScore){ bestScore = score; best = i; }
+    });
+    if (best < 0) break;
+    var card = S.ai.hand.splice(best, 1)[0];
+    S.ai.field.push(makeFieldMonster(card));
+    S.ai.playedMonster = true;
+    if (card.rally) applyRally('ai');
+    log('Rival summons ' + card.name + ' (' + card.summon + ' turn' + (card.summon>1?'s':'') + ' to summon).');
+    played++;
+  }
+}
+function totalFieldHp(side){
+  var t = 0;
+  S[side].field.forEach(function(m){ t += m.hp; });
+  return t;
+}
+function aiTryCombine(){
+  var ci = -1;
+  for (var i=0;i<S.ai.hand.length;i++){ if (S.ai.hand[i].kind==='spell' && S.ai.hand[i].id==='combine'){ ci=i; break; } }
+  if (ci < 0) return false;
+  // best same-rarity pair by combined ATK
+  var byR = {};
+  S.ai.field.forEach(function(m, idx){ (byR[m.rarity] = byR[m.rarity] || []).push(idx); });
+  var bestPair = null, bestScore = -1;
+  Object.keys(byR).forEach(function(r){
+    var arr = byR[r];
+    for (var a=0;a<arr.length;a++){
+      for (var b=a+1;b<arr.length;b++){
+        var sc = S.ai.field[arr[a]].atk + S.ai.field[arr[b]].atk;
+        if (sc > bestScore){ bestScore = sc; bestPair = [arr[a], arr[b]]; }
+      }
+    }
+  });
+  if (!bestPair) return false;
+  return doCombine('ai', ci, bestPair[0], bestPair[1]);
+}
+function aiSpellTarget(c){
+  if (c.id === 'fireball' || c.id === 'lightning'){
+    if (S.you.field.length === 0) return null;
+    var killHp = c.id === 'fireball' ? 3 : 2, idx = -1;
+    S.you.field.forEach(function(m, i){ if (!m.spellImmune && m.hp <= killHp && (idx < 0 || m.hp < S.you.field[idx].hp)) idx = i; });
+    if (idx < 0){
+      S.you.field.forEach(function(m, i){ if (!m.spellImmune && (idx < 0 || m.atk > S.you.field[idx].atk)) idx = i; });
+    }
+    return idx >= 0 ? { type:'monster', side:'you', idx:idx } : null;
+  }
+  if (c.id === 'swamp'){
+    var youHp = totalFieldHp('you'), aiHp = totalFieldHp('ai');
+    if (S.ai.field.length === 0 && S.you.field.length > 0) return { type:'all' };
+    if (youHp > aiHp + 2) return { type:'all' };
+    return null;
+  }
+  if (c.id === 'sword'){
+    if (S.ai.field.length === 0) return null;
+    var idx = 0;
+    S.ai.field.forEach(function(m, i){ if (m.atk > S.ai.field[idx].atk) idx = i; });
+    return { type:'monster', side:'ai', idx:idx };
+  }
+  if (c.id === 'weaken'){
+    if (S.you.field.length === 0) return null;
+    var idx = -1;
+    S.you.field.forEach(function(m, i){ if (!m.spellImmune && (idx < 0 || m.atk > S.you.field[idx].atk)) idx = i; });
+    return idx >= 0 ? { type:'monster', side:'you', idx:idx } : null;
+  }
+  if (c.id === 'curse'){
+    if (S.you.field.length === 0) return null;
+    var idx = -1;
+    S.you.field.forEach(function(m, i){ if (!m.spellImmune && (idx < 0 || (m.atk + m.def) > (S.you.field[idx].atk + S.you.field[idx].def))) idx = i; });
+    return idx >= 0 ? { type:'monster', side:'you', idx:idx } : null;
+  }
+  if (c.id === 'sacrifice'){
+    if (S.ai.hp > 12 || S.ai.field.length === 0) return null;
+    var idx = 0;
+    S.ai.field.forEach(function(m, i){ if ((m.atk + m.hp) < (S.ai.field[idx].atk + S.ai.field[idx].hp)) idx = i; });
+    return { type:'monster', side:'ai', idx:idx };
+  }
+  if (c.id === 'heal'){
+    var idx = -1, worst = 1;
+    S.ai.field.forEach(function(m, i){ var f = m.hp / m.maxHp; if (f < 1 && f < worst){ worst = f; idx = i; } });
+    return idx >= 0 ? { type:'monster', side:'ai', idx:idx } : null;
+  }
+  if (c.id === 'poison'){
+    var idx = -1;
+    S.you.field.forEach(function(m, i){ if (!m.spellImmune && !m.immunePoison && (idx < 0 || m.hp > S.you.field[idx].hp)) idx = i; });
+    return idx >= 0 ? { type:'monster', side:'you', idx:idx } : null;
+  }
+  if (c.id === 'shield'){
+    if (S.ai.field.length === 0) return null;
+    var idx = -1;
+    S.ai.field.forEach(function(m, i){ if (idx < 0 || m.def < S.ai.field[idx].def) idx = i; });
+    return { type:'monster', side:'ai', idx:idx };
+  }
+  if (c.id === 'freeze'){
+    if (S.you.field.length === 0) return null;
+    var idx = -1;
+    S.you.field.forEach(function(m, i){ if (!m.spellImmune && (idx < 0 || m.atk > S.you.field[idx].atk)) idx = i; });
+    return idx >= 0 ? { type:'monster', side:'you', idx:idx } : null;
+  }
+  if (c.id === 'revive'){
+    if (S.ai.field.length >= FIELD_MAX) return null;
+    return reviveTarget('ai') ? { type:'revive' } : null;
+  }
+  if (c.id === 'meteor'){
+    if (S.you.field.length === 0) return null;
+    var canKill = false, n = 0;
+    S.you.field.forEach(function(m){ if (m.hp <= 2) canKill = true; n++; });
+    if (canKill || n >= 2) return { type:'enemyField' };
+    return null;
+  }
+  if (c.id === 'haste'){
+    var any = false;
+    S.ai.field.forEach(function(m){ if (m.summonLeft > 0) any = true; });
+    return any ? { type:'self' } : null;
+  }
+  if (c.id === 'double-strike'){
+    var idx = -1;
+    S.ai.field.forEach(function(m, i){ if (m.summonLeft === 0 && m.canAttack && (idx < 0 || m.atk > S.ai.field[idx].atk)) idx = i; });
+    return idx >= 0 ? { type:'monster', side:'ai', idx:idx } : null;
+  }
+  if (c.id === 'blessing'){
+    return S.ai.hp < MAX_HP ? { type:'self' } : null;
+  }
+  return null;
+}
+function aiCastSpells(){
+  aiTryCombine();
+  if (S.over) return;
+  for (var i = S.ai.hand.length - 1; i >= 0; i--){
+    var c = S.ai.hand[i];
+    if (!c || c.kind !== 'spell') continue;
+    if (c.id === 'combine') continue;
+    var tgt = aiSpellTarget(c);
+    if (tgt) castSpell('ai', i, tgt);
+    if (S.over) return;
+  }
+  aiTryCombine();
+}
+function aiAttack(){
+  var attackers = S.ai.field.slice();
+  attackers.forEach(function(m){
+    if (S.over) return;
+    if (S.ai.field.indexOf(m) < 0) return;
+    if (m.summonLeft > 0 || !m.canAttack) return;
+    var target;
+    if (S.you.field.length === 0){ target = { type:'player', side:'you' }; }
+    else {
+      var g = hasGuardian('you');
+      var idx;
+      if (g >= 0){ idx = g; }
+      else {
+        idx = 0;
+        S.you.field.forEach(function(em, i){
+          if (em.hp < S.you.field[idx].hp || (em.hp === S.you.field[idx].hp && em.atk > S.you.field[idx].atk)) idx = i;
+        });
+      }
+      target = { type:'monster', side:'you', idx:idx };
+    }
+    doAttack('ai', m, target);
+  });
+}
+
+/* ---- Render ---- */
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
+function hpHtml(hp){ return Math.max(0, hp) + ' / ' + MAX_HP; }
+function monsterCardHtml(m, side, idx){
+  var cls = 'card ' + m.rarity;
+  if (m.super) cls += ' super';
+  var extra = '';
+  if (m.frozen > 0){ cls += ' summoning'; extra = '<div class="sm">Frozen</div>'; }
+  else if (m.summonLeft > 0){ cls += ' summoning'; extra = '<div class="sm">Summoning: ' + m.summonLeft + '</div>'; }
+  else if (!m.canAttack){ cls += ' attacked'; extra = '<div class="sm">Attacked</div>'; }
+  else { extra = '<div class="sm">Ready</div>'; }
+  if (m.extraAttacks > 0) extra += '<div class="sm">Double Strike</div>';
+  if (side === 'you' && S.turn === 'you' && !S.busy && !S.over && m.summonLeft === 0 && m.canAttack){ cls += ' ready'; }
+  if (S.sel && S.sel.type === 'attack' && side === 'ai'){ cls += ' targetable'; }
+  if (S.sel && S.sel.type === 'spell'){
+    var c = S.you.hand[S.sel.idx];
+    if (c && c.target === 'enemyMonster' && side === 'ai' && !m.spellImmune && !(c.poison && m.immunePoison)) cls += ' targetable';
+    if (c && (c.target === 'allyMonster' || c.target === 'sacrifice') && side === 'you') cls += ' targetable';
+  }
+  if (S.sel && S.sel.type === 'combine' && side === 'you'){
+    if (S.sel.picked.indexOf(idx) >= 0){ cls += ' selected'; }
+    else if (hasCombinePartner(S.you.field, idx)){ cls += ' targetable'; }
+  }
+  var poison = m.poison > 0 ? '<div class="poison">POISON ' + m.poison + '</div>' : '';
+  var superb = m.super ? '<div class="superbadge">SUPER</div>' : '';
+  var click = side === 'you' ? 'onclick="onMyMonster(' + idx + ')"' : 'onclick="onEnemyMonster(' + idx + ')"';
+  var notes = '';
+  if (m.poisonAbility) notes += '<div class="sm">Poisons on battle win</div>';
+  if (m.immunePoison) notes += '<div class="sm">Poison-immune</div>';
+  if (m.lifeDrain) notes += '<div class="sm">Life Drain: heals on battle win</div>';
+  if (m.thorns) notes += '<div class="sm">Thorns: 1 damage back on loss</div>';
+  if (m.guardian) notes += '<div class="sm">Guardian: must be attacked first</div>';
+  if (m.rally) notes += '<div class="sm">Rally: allies gain +1 ATK on entry</div>';
+  if (m.spellImmune) notes += '<div class="sm">Immune to spells</div>';
+  return '<div class="' + cls + '" ' + click + '>' + poison + superb +
+    '<div class="nm">' + esc(m.name) + '</div>' +
+    '<div class="tp">Monster &middot; ' + esc(m.rarity) + '</div>' +
+    '<div class="st">ATK ' + m.atk + ' &middot; DEF ' + m.def + '</div>' +
+    '<div class="st">HP ' + m.hp + '/' + m.maxHp + '</div>' +
+    extra + notes +
+    '</div>';
+}
+function handCardHtml(c, idx){
+  var cls = 'card ' + (c.kind === 'monster' ? c.rarity : 'spell');
+  if (S.sel && S.sel.type === 'spell' && S.sel.idx === idx) cls += ' selected';
+  if (S.sel && S.sel.type === 'combine' && S.sel.idx === idx) cls += ' selected';
+  if (S.turn !== 'you' || S.busy || S.over) cls += ' notyourturn';
+  var body;
+  if (c.kind === 'monster'){
+    body = '<div class="nm">' + esc(c.name) + '</div><div class="tp">Monster &middot; ' + esc(c.rarity) + '</div>' +
+      '<div class="st">ATK ' + c.atk + ' &middot; DEF ' + c.def + '</div>' +
+      '<div class="st">HP ' + c.hp + '</div>' +
+      '<div class="sm">Summon: ' + c.summon + ' turn' + (c.summon>1?'s':'') + '</div>' +
+      (c.poison ? '<div class="sm">Poisons on battle win</div>' : '') +
+      (c.immunePoison ? '<div class="sm">Poison-immune</div>' : '') +
+      (c.lifeDrain ? '<div class="sm">Life Drain: heals on battle win</div>' : '') +
+      (c.thorns ? '<div class="sm">Thorns: 1 damage back on loss</div>' : '') +
+      (c.guardian ? '<div class="sm">Guardian: must be attacked first</div>' : '') +
+      (c.rally ? '<div class="sm">Rally: allies gain +1 ATK on entry</div>' : '') +
+      (c.spellImmune ? '<div class="sm">Immune to spells</div>' : '');
+  } else {
+    body = '<div class="nm">' + esc(c.name) + '</div><div class="tp">Spell</div><div class="tx">' + esc(c.text) + '</div>';
+  }
+  return '<div class="' + cls + '" onclick="onHand(' + idx + ')">' + body + '</div>';
+}
+function render(){
+  if (!S) return;
+  // HP
+  var youPct = Math.max(0, S.you.hp) / MAX_HP * 100;
+  var aiPct = Math.max(0, S.ai.hp) / MAX_HP * 100;
+  var yf = document.getElementById('youHpFill'); yf.style.width = youPct + '%'; yf.className = 'hpfill' + (youPct <= 25 ? ' low' : '');
+  var af = document.getElementById('rivalHpFill'); af.style.width = aiPct + '%'; af.className = 'hpfill' + (aiPct <= 25 ? ' low' : '');
+  document.getElementById('youHpNum').textContent = hpHtml(S.you.hp);
+  document.getElementById('rivalHpNum').textContent = hpHtml(S.ai.hp);
+  document.getElementById('youTag').textContent = S.turn === 'you' ? 'Turn ' + S.turnCount + ' — your move' : 'Turn ' + S.turnCount;
+  document.getElementById('rivalTag').textContent = S.turn === 'ai' ? 'Turn ' + S.turnCount + ' — thinking…' : 'Turn ' + S.turnCount;
+  document.getElementById('rivalHandCount').textContent = '· ' + S.ai.hand.length + ' cards in hand';
+  document.getElementById('deckCount').textContent = '· ' + S.you.deck.length + ' left in deck';
+  // fields
+  var rf = document.getElementById('rivalField');
+  rf.innerHTML = S.ai.field.map(function(m, i){ return monsterCardHtml(m, 'ai', i); }).join('');
+  rf.className = 'field' + (S.ai.field.length === 0 ? ' empty' : '');
+  var yfd = document.getElementById('youField');
+  yfd.innerHTML = S.you.field.map(function(m, i){ return monsterCardHtml(m, 'you', i); }).join('');
+  yfd.className = 'field' + (S.you.field.length === 0 ? ' empty' : '');
+  // hand
+  document.getElementById('youHand').innerHTML = S.you.hand.map(function(c, i){ return handCardHtml(c, i); }).join('') ||
+    '<div style="color:#9a968a;font-style:italic;padding:6px;">No cards in hand</div>';
+  // rival avatar targetable? (direct attack only)
+  var ra = document.getElementById('rivalAvatar');
+  var raT = false;
+  if (S.sel && S.turn === 'you' && !S.busy && !S.over){
+    if (S.sel.type === 'attack' && S.ai.field.length === 0){ raT = true; }
+  }
+  ra.className = 'avatar rival' + (raT ? ' targetable' : '');
+  ra.setAttribute('onclick', raT ? 'onEnemyPlayer()' : '');
+  // hint
+  var hint = '';
+  if (S.over){ hint = ''; }
+  else if (S.busy || S.turn === 'ai'){ hint = 'Rival is taking their turn…'; }
+  else if (S.sel && S.sel.type === 'combine'){
+    var n = S.sel.picked.length;
+    hint = n === 0
+      ? 'Combine — tap <b>two</b> of your monsters with the <b>same symbol</b> (rarity) to fuse them. Tap the card again to cancel.'
+      : 'Picked ' + n + ' — tap a second monster with the <b>same symbol</b> to fuse them.';
+  }
+  else if (S.sel && S.sel.type === 'spell'){
+    var sc = S.you.hand[S.sel.idx];
+    if (sc && sc.id === 'sacrifice'){ hint = 'Sacrifice — tap one of <b>your</b> monsters to destroy it and heal 4 HP (tap the spell again to cancel).'; }
+    else if (sc){ hint = 'Pick a target for <b>' + esc(sc.name) + '</b> — tap a glowing card (tap the spell again to cancel).'; }
+    else { hint = ''; }
+  }
+  else if (S.sel && S.sel.type === 'attack'){
+    var am = S.you.field[S.sel.idx];
+    hint = am ? 'Pick a target for <b>' + esc(am.name) + '</b> — tap a rival monster' + (S.ai.field.length === 0 ? ', or the rival directly' : '') + ' (tap it again to cancel).' : '';
+  }
+  else { hint = 'Your turn — tap a card to play it, tap a ready monster to attack, then <b>End Turn</b>.'; }
+  document.getElementById('hint').innerHTML = hint;
+  // end turn button
+  document.getElementById('endTurnBtn').disabled = (S.busy || S.over || S.turn !== 'you');
+  // log
+  document.getElementById('log').innerHTML = S.log.map(function(l){ return '<div>' + esc(l) + '</div>'; }).join('');
+}
+renderDeckBuilder();
+</script>
+</body>
+</html>
